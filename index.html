@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇧🇷 Voyage Brésil — Juillet/Août 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #002776; --green: #009c3b; --yellow: #ffdf00;
+    --light: #f7f8fa; --card: #ffffff; --border: #e4e7ed;
+    --text: #1a1a2e; --muted: #6b7280;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--light); color: var(--text); }
+
+  /* HEADER */
+  header { background: linear-gradient(135deg, var(--blue), #003d9e); color: white; padding: 2rem 1.5rem 1.5rem; text-align: center; }
+  header h1 { font-size: 1.9rem; font-weight: 700; }
+  header p { opacity: .75; margin-top: .35rem; font-size: .9rem; }
+  .header-route { display: inline-block; background: rgba(255,255,255,.12); border-radius: 999px; padding: .3rem 1rem; font-size: .8rem; margin-top: .7rem; }
+  .header-dates { font-size: .85rem; margin-top: .4rem; opacity: .85; font-weight: 600; }
+
+  /* NAV */
+  nav { background: white; border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; position: sticky; top: 0; z-index: 100; }
+  nav button { flex: none; padding: .85rem 1.1rem; border: none; background: none; cursor: pointer; font-size: .82rem; font-weight: 500; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; transition: all .2s; }
+  nav button.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  main { max-width: 800px; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .section-title { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 1.4rem 0 .6rem; }
+
+  /* CARDS */
+  .card { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); margin-bottom: .75rem; }
+  .card-header { padding: 1rem 1.2rem; display: flex; align-items: center; gap: .8rem; }
+  .card-body { border-top: 1px solid var(--border); }
+  .info-row { display: flex; align-items: flex-start; gap: .6rem; padding: .6rem 1.2rem; border-bottom: 1px solid #f3f4f6; font-size: .85rem; }
+  .info-row:last-child { border-bottom: none; }
+  .info-icon { font-size: .9rem; margin-top: 1px; flex-shrink: 0; }
+  .info-label { color: var(--muted); min-width: 95px; font-size: .8rem; margin-top: 1px; flex-shrink: 0; }
+  .info-val { color: var(--text); flex: 1; line-height: 1.5; }
+  .etape-location { font-size: 1rem; font-weight: 700; }
+  .etape-dates { font-size: .8rem; color: var(--muted); margin-top: .1rem; }
+  .etape-emoji { font-size: 1.4rem; }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: .15rem .5rem; border-radius: 4px; font-size: .7rem; font-weight: 600; text-transform: uppercase; }
+  .badge-ok { background: #f0fdf4; color: #15803d; }
+  .badge-warn { background: #fff7ed; color: #c2410c; }
+  .badge-ref { background: #eff6ff; color: #1d4ed8; }
+  .badge-premium { background: #fdf4ff; color: #7e22ce; }
+
+  /* TIMELINE */
+  .timeline-item { display: flex; gap: 1rem; }
+  .timeline-left { display: flex; flex-direction: column; align-items: center; width: 36px; flex-shrink: 0; }
+  .timeline-dot { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; border: 2px solid white; margin-top: 1.2rem; z-index: 1; }
+  .timeline-line { width: 2px; flex: 1; min-height: 16px; background: var(--border); margin: 0 auto; }
+  .timeline-content { flex: 1; padding-bottom: .9rem; }
+
+  /* FLIGHT CARDS */
+  .flight-big { background: white; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: .75rem; overflow: hidden; }
+  .flight-big-header { padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border); }
+  .flight-big-route { font-size: 1rem; font-weight: 700; }
+  .flight-big-info { font-size: .8rem; color: var(--muted); margin-top: .25rem; }
+  .flight-times { display: flex; align-items: center; gap: .5rem; padding: 1rem 1.2rem; }
+  .flight-time-box { text-align: center; }
+  .flight-time-big { font-size: 1.6rem; font-weight: 700; line-height: 1; }
+  .flight-time-label { font-size: .75rem; color: var(--muted); margin-top: .2rem; }
+  .flight-arrow { flex: 1; text-align: center; position: relative; }
+  .flight-arrow-line { height: 1px; background: var(--border); width: 100%; position: absolute; top: 50%; transform: translateY(-50%); }
+  .flight-arrow-txt { font-size: .72rem; color: var(--muted); position: relative; background: white; padding: 0 .4rem; }
+  .flight-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--border); }
+  .flight-detail { padding: .7rem 1.2rem; border-bottom: 1px solid #f3f4f6; font-size: .82rem; }
+  .flight-detail:nth-child(odd) { border-right: 1px solid #f3f4f6; }
+  .flight-detail-label { font-size: .72rem; color: var(--muted); margin-bottom: .15rem; }
+  .flight-detail-val { font-weight: 500; }
+
+  /* CALENDAR */
+  .cal-wrapper { display: flex; flex-direction: column; gap: 1.5rem; }
+  .cal-month { background: white; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
+  .cal-month-header { background: var(--blue); color: white; padding: .9rem 1rem; font-weight: 700; font-size: 1rem; text-align: center; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .cal-day-header { padding: .5rem .2rem; text-align: center; font-size: .72rem; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--border); background: #f9fafb; }
+  .cal-day { padding: .4rem .3rem; min-height: 52px; border-right: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; font-size: .8rem; position: relative; vertical-align: top; }
+  .cal-day:nth-child(7n) { border-right: none; }
+  .cal-day.empty { background: #fafafa; }
+  .cal-day.has-event { cursor: default; }
+  .cal-day-num { font-size: .78rem; font-weight: 600; margin-bottom: .2rem; color: var(--text); }
+  .cal-day.today .cal-day-num { background: var(--blue); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .72rem; }
+  .cal-event { font-size: .65rem; padding: .1rem .3rem; border-radius: 3px; margin-bottom: .1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ev-flight { background: #dbeafe; color: #1e40af; }
+  .ev-rio { background: #d1fae5; color: #065f46; }
+  .ev-ilha { background: #cffafe; color: #0e7490; }
+  .ev-paraty { background: #fef3c7; color: #92400e; }
+  .ev-sp { background: #ede9fe; color: #5b21b6; }
+  .ev-jeri { background: #dcfce7; color: #166534; }
+  .ev-retour { background: #fee2e2; color: #991b1b; }
+
+  /* LEGEND */
+  .cal-legend { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+  .legend-item { display: flex; align-items: center; gap: .3rem; font-size: .75rem; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* TASKS */
+  .task-item { display: flex; align-items: flex-start; gap: .7rem; padding: .7rem .9rem; border-radius: 8px; margin-bottom: .45rem; background: white; border: 1px solid var(--border); cursor: pointer; transition: all .15s; }
+  .task-item:hover { border-color: #c7d2fe; }
+  .task-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .65rem; transition: all .15s; margin-top: 1px; }
+  .task-item.done .task-check { background: #10b981; border-color: #10b981; color: white; }
+  .task-item.done .task-text { text-decoration: line-through; color: var(--muted); }
+  .task-text { font-size: .85rem; flex: 1; line-height: 1.4; }
+  .task-priority { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .p-high { background: #ef4444; } .p-med { background: #f59e0b; } .p-low { background: #10b981; }
+  .btn { padding: .55rem 1.1rem; border-radius: 8px; border: none; cursor: pointer; font-size: .83rem; font-weight: 600; transition: all .15s; }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-sm { padding: .28rem .65rem; font-size: .75rem; }
+  .btn-del { background: #fee2e2; color: #dc2626; }
+
+  #add-task-form { background: white; border-radius: 10px; border: 1px solid var(--border); padding: .9rem; margin-bottom: .9rem; display: none; }
+  #add-task-form.visible { display: block; }
+  #add-task-form input, #add-task-form select, .note-form input, .note-form select, .note-form textarea {
+    width: 100%; padding: .55rem .75rem; border: 1px solid var(--border); border-radius: 8px; font-size: .85rem; margin-bottom: .45rem; font-family: inherit; color: var(--text);
+  }
+  .form-row { display: flex; gap: .4rem; margin-bottom: .45rem; }
+  .form-row input, .form-row select { margin-bottom: 0; }
+
+  /* NOTES */
+  .note-form { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 1rem; margin-bottom: 1rem; }
+  .note-form textarea { height: 75px; resize: vertical; }
+  .note-item { background: white; border-radius: 10px; border: 1px solid var(--border); padding: .85rem 1rem; margin-bottom: .55rem; }
+  .note-meta { display: flex; align-items: center; gap: .45rem; margin-bottom: .35rem; flex-wrap: wrap; }
+  .note-author { font-size: .72rem; font-weight: 700; padding: .18rem .55rem; border-radius: 999px; }
+  .note-author.guillaume { background: #dbeafe; color: #1d4ed8; }
+  .note-author.femme { background: #fce7f3; color: #be185d; }
+  .note-date { font-size: .72rem; color: var(--muted); }
+  .note-stage { font-size: .72rem; color: var(--muted); margin-left: auto; }
+  .note-text { font-size: .86rem; line-height: 1.5; }
+
+  /* DOCS */
+  .drop-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 1.8rem; text-align: center; cursor: pointer; transition: all .2s; background: white; margin-bottom: 1rem; }
+  .drop-zone:hover, .drop-zone.dragging { border-color: var(--blue); background: #eff6ff; }
+  .drop-zone p { font-size: .85rem; color: var(--muted); margin-top: .3rem; }
+  #file-input { display: none; }
+  .doc-item { background: white; border-radius: 10px; border: 1px solid var(--border); padding: .75rem 1rem; margin-bottom: .45rem; display: flex; align-items: center; gap: .75rem; }
+  .doc-icon { font-size: 1.3rem; }
+  .doc-info { flex: 1; }
+  .doc-name { font-size: .85rem; font-weight: 600; }
+  .doc-meta { font-size: .72rem; color: var(--muted); }
+  .empty-state { text-align: center; padding: 2rem; color: var(--muted); font-size: .88rem; }
+  .empty-state span { font-size: 1.8rem; display: block; margin-bottom: .4rem; }
+
+  /* FAB */
+  .fab {
+    position: fixed; bottom: 1.8rem; right: 1.5rem; z-index: 200;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--blue); color: white; border: none;
+    font-size: 1.6rem; cursor: pointer; box-shadow: 0 4px 16px rgba(0,39,118,.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; line-height: 1;
+  }
+  .fab:hover { background: #003d9e; transform: scale(1.08); }
+  .fab.open { transform: rotate(45deg); background: #64748b; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 300; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal {
+    background: white; border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 600px; padding: 1.5rem 1.2rem 2.5rem;
+    animation: slideUp .22s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-handle { width: 36px; height: 4px; background: #e2e8f0; border-radius: 99px; margin: 0 auto 1.2rem; }
+  .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+
+  .quick-types { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-bottom: 1.1rem; }
+  .quick-type {
+    padding: .8rem; border-radius: 10px; border: 2px solid var(--border);
+    cursor: pointer; text-align: center; transition: all .15s; background: white;
+    font-size: .82rem; font-weight: 600;
+  }
+  .quick-type .qt-icon { font-size: 1.4rem; display: block; margin-bottom: .2rem; }
+  .quick-type:hover, .quick-type.selected { border-color: var(--blue); background: #eff6ff; color: var(--blue); }
+
+  .modal-form { display: none; }
+  .modal-form.visible { display: block; }
+  .modal-form input, .modal-form select, .modal-form textarea {
+    width: 100%; padding: .6rem .8rem; border: 1px solid var(--border);
+    border-radius: 8px; font-size: .88rem; margin-bottom: .5rem;
+    font-family: inherit; color: var(--text);
+  }
+  .modal-form textarea { height: 80px; resize: vertical; }
+  .modal-form .form-row { display: flex; gap: .5rem; margin-bottom: .5rem; }
+  .modal-form .form-row input, .modal-form .form-row select { margin-bottom: 0; }
+  .modal-actions { display: flex; gap: .5rem; margin-top: .3rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="font-size:1.5rem">🇧🇷</div>
+  <h1>Voyage Brésil 2026</h1>
+  <p>Guillaume & Valérie</p>
+  <div class="header-dates">26 juillet → 21 août 2026 · 26 jours</div>
+  <div class="header-route">Paris → Fortaleza → Rio → Ilha Grande → Paraty → São Paulo → Jericoacoara → Paris</div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('calendrier',this)">📅 Calendrier</button>
+  <button onclick="showTab('itineraire',this)">🗺️ Itinéraire</button>
+  <button onclick="showTab('vols',this)">✈️ Vols</button>
+  <button onclick="showTab('taches',this)">✅ À faire</button>
+  <button onclick="showTab('notes',this)">📝 Notes</button>
+  <button onclick="showTab('docs',this)">📎 Documents</button>
+</nav>
+
+<main>
+
+<!-- ===== CALENDRIER ===== -->
+<div id="tab-calendrier" class="tab-content active">
+  <div class="cal-legend">
+    <div class="legend-item"><div class="legend-dot ev-flight"></div> Vol</div>
+    <div class="legend-item"><div class="legend-dot ev-rio"></div> Rio de Janeiro</div>
+    <div class="legend-item"><div class="legend-dot ev-ilha"></div> Ilha Grande</div>
+    <div class="legend-item"><div class="legend-dot ev-paraty"></div> Paraty</div>
+    <div class="legend-item"><div class="legend-dot ev-sp"></div> São Paulo</div>
+    <div class="legend-item"><div class="legend-dot ev-jeri"></div> Tatajuba / Camocim</div>
+  </div>
+  <div class="cal-wrapper" id="calendar-root"></div>
+</div>
+
+<!-- ===== ITINÉRAIRE ===== -->
+<div id="tab-itineraire" class="tab-content">
+  <div class="timeline">
+
+    <div class="timeline-item">
+      <div class="timeline-left"><div class="timeline-dot" style="background:#6366f1"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="card">
+          <div class="card-header" style="background:#f5f3ff">
+            <span class="etape-emoji">🛫</span>
+            <div><div class="etape-location">Départ Paris CDG</div><div class="etape-dates">Dimanche 26 juillet · 13h40 · Terminal 2E</div></div>
+          </div>
+          <div class="card-body">
+            <div class="info-row"><span class="info-icon">✈️</span><span class="info-label">Vol aller</span><span class="info-val">Air France <strong>AF416</strong> · Airbus A350-900 · Economy · 9h05 <span class="badge badge-ok">Confirmé</span></span></div>
+            <div class="info-row"><span class="info-icon">🧳</span><span class="info-label">Bagages</span><span class="info-val">2 petits sacs · 2 bagages à main · 2 bagages en soute</span></div>
+            <div class="info-row"><span class="info-icon">🍽️</span><span class="info-label">Repas</span><span class="info-val">2× repas sans gluten</span></div>
+            <div class="info-row"><span class="info-icon">🔗</span><span class="info-label">Connexion</span><span class="info-val">Fortaleza → Rio GIG · LATAM 21h25 → 27 juil. 0h50 <span class="badge badge-ref">Réf. ELYYXW</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-left"><div class="timeline-dot" style="background:#10b981"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="card">
+          <div class="card-header" style="background:#f0fdf4">
+            <span class="etape-emoji">🏖️</span>
+            <div><div class="etape-location">Rio de Janeiro</div><div class="etape-dates">27 juil. → 31 juil. · Check-out 11h00</div></div>
+          </div>
+          <div class="card-body">
+            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Logement</span><span class="info-val">R. Farme de Amoedo, 41 — Ipanema, Rio de Janeiro - RJ, 22420-020</span></div>
+            <div class="info-row"><span class="info-icon">📅</span><span class="info-label">Durée</span><span class="info-val">4 nuits</span></div>
+            <div class="info-row"><span class="info-icon">🚗</span><span class="info-label">Transfert</span><span class="info-val"><span class="badge badge-warn">⚠️ À organiser</span> Aéroport GIG → Ipanema (arrivée ~0h50)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-left"><div class="timeline-dot" style="background:#06b6d4"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="card">
+          <div class="card-header" style="background:#ecfeff">
+            <span class="etape-emoji">🏝️</span>
+            <div><div class="etape-location">Ilha Grande</div><div class="etape-dates">31 juil. → 3 août · 3 nuits</div></div>
+          </div>
+          <div class="card-body">
+            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Logement</span><span class="info-val">Atlantica Jungle Lodge</span></div>
+            <div class="info-row"><span class="info-icon">⛵</span><span class="info-label">Accès</span><span class="info-val">Ferry depuis Angra dos Reis <span class="badge badge-warn">⚠️ À réserver</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-left"><div class="timeline-dot" style="background:#f59e0b"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="card">
+          <div class="card-header" style="background:#fffbeb">
+            <span class="etape-emoji">🏛️</span>
+            <div><div class="etape-location">Paraty</div><div class="etape-dates">3 août → 6 août · 3 nuits</div></div>
+          </div>
+          <div class="card-body">
+            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Nuit 3/4</span><span class="info-val"><span class="badge badge-warn">⚠️ Logement à confirmer</span></span></div>
+            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Nuit 4/5</span><span class="info-val">Cultura Caiçara Ponta Negra <span class="badge badge-ok">Réservé</span><br><small style="color:var(--muted)">Praia de Ponta Negra, Paraty · Check-in 4 août 14h-18h · Check-out 5 août 08h-12h</small></span></div>
+            <div class="info-row"><span class="info-icon">🚶</span><span class="info-label">Accès</span><span class="info-val">Aller à pied depuis Paraty · Retour en bateau</span></div>
+            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Nuit 5/6</span><span class="info-val"><span class="badge badge-warn">⚠️ Logement à confirmer</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-left"><div class="timeline-dot" style="background:#8b5cf6"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="card">
+          <div class="card-header" style="background:#f5f3ff">
+            <span class="etape-emoji">🌆</span>
+            <div><div class="etape-location">São Paulo · Transit GRU</div><div class="etape-dates">Nuit du 6 août</div></div>
+          </div>
+          <div class="card-body">
+            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Logement</span><span class="info-val">Comfort Hotel Guarulhos Aeroporto <span class="badge badge-ok">Confirmé</span></span></div>
+            <div class="info-row"><span class="info-icon">🚗</span><span class="info-label">Transfert</span><span class="info-val"><span class="badge badge-warn">⚠️ À organiser</span> Paraty → São Paulo GRU (~5h de route)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-left"><div class="timeline-dot" style="background:#009c3b"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="card">
+          <div class="card-header" style="background:#f0fdf4">
+            <span class="etape-emoji">🏜️</span>
+            <div><div class="etape-location">Tatajuba · Camocim · Curimas</div><div class="etape-dates">7 août → 20 août</div></div>
+          </div>
+          <div class="card-body">
+            <div class="info-row"><span class="info-icon">✈️</span><span class="info-label">Vol</span><span class="info-val">LATAM · GRU → JJD · 7 août 8h05 → 11h30 <span class="badge badge-ref">Réf. FVZDSL</span></span></div>
+            <div class="info-row"><span class="info-icon">🏠</span><span class="info-label">Logement</span><span class="info-val">Tatajuba <span class="badge badge-warn">⚠️ À confirmer</span></span></div>
+            <div class="info-row"><span class="info-icon">🚗</span><span class="info-label">Transfert</span><span class="info-val"><span class="badge badge-warn">⚠️ À organiser</span> JJD → Tatajuba (4x4 / buggy)</span></div>
+            <div class="info-row"><span class="info-icon">⛺</span><span class="info-label">12 août</span><span class="info-val">Glamping · Camocim</span></div>
+            <div class="info-row"><span class="info-icon">🌊</span><span class="info-label">13 août</span><span class="info-val">Curimas</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-left"><div class="timeline-dot" style="background:#6366f1"></div></div>
+      <div class="timeline-content">
+        <div class="card">
+          <div class="card-header" style="background:#f5f3ff">
+            <span class="etape-emoji">🛬</span>
+            <div><div class="etape-location">Retour Paris CDG</div><div class="etape-dates">Jeudi 20 août · départ Fortaleza 19h55</div></div>
+          </div>
+          <div class="card-body">
+            <div class="info-row"><span class="info-icon">✈️</span><span class="info-label">Vol retour</span><span class="info-val">Air France <strong>AF415</strong> · Boeing 777-200 · <span class="badge badge-premium">✨ Premium</span> · 8h40 · Sièges 11K & 11L</span></div>
+            <div class="info-row"><span class="info-icon">🧳</span><span class="info-label">Bagages</span><span class="info-val">2 petits sacs · 4 bagages à main · 4 bagages en soute</span></div>
+            <div class="info-row"><span class="info-icon">🍽️</span><span class="info-label">Repas</span><span class="info-val">Petit-déjeuner + Repas · 2× sans gluten</span></div>
+            <div class="info-row"><span class="info-icon">🚗</span><span class="info-label">Vers Fortaleza</span><span class="info-val"><span class="badge badge-warn">⚠️ À organiser</span> Jericoacoara → Fortaleza (FOR)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== VOLS ===== -->
+<div id="tab-vols" class="tab-content">
+
+  <p class="section-title">Vol 1 · Aller Paris → Brésil</p>
+  <div class="flight-big">
+    <div class="flight-big-header">
+      <div>
+        <div class="flight-big-route">✈️ Paris CDG → Fortaleza (FOR)</div>
+        <div class="flight-big-info">Air France · AF416 · Dimanche 26 juillet 2026 · Terminal 2E</div>
+      </div>
+      <span class="badge badge-ok">Confirmé</span>
+    </div>
+    <div class="flight-times">
+      <div class="flight-time-box"><div class="flight-time-big">13h40</div><div class="flight-time-label">Paris CDG</div></div>
+      <div class="flight-arrow"><div class="flight-arrow-line"></div><div class="flight-arrow-txt">✈ 9h05</div></div>
+      <div class="flight-time-box"><div class="flight-time-big">~22h45</div><div class="flight-time-label">Fortaleza FOR</div></div>
+    </div>
+    <div class="flight-details-grid">
+      <div class="flight-detail"><div class="flight-detail-label">Appareil</div><div class="flight-detail-val">Airbus A350-900</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Classe</div><div class="flight-detail-val">Economy</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Bagages soute</div><div class="flight-detail-val">2× bagages</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Repas</div><div class="flight-detail-val">2× sans gluten</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Siège</div><div class="flight-detail-val">À sélectionner ⚠️</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Bagage main</div><div class="flight-detail-val">2× bagages à main</div></div>
+    </div>
+  </div>
+
+  <p class="section-title">Vol 2 · Connexion Fortaleza → Rio</p>
+  <div class="flight-big">
+    <div class="flight-big-header">
+      <div>
+        <div class="flight-big-route">✈️ Fortaleza (FOR) → Rio de Janeiro (GIG)</div>
+        <div class="flight-big-info">LATAM · Opéré par LA · 26 juillet 2026 · Réf. <strong>ELYYXW</strong></div>
+      </div>
+      <span class="badge badge-ok">Confirmé</span>
+    </div>
+    <div class="flight-times">
+      <div class="flight-time-box"><div class="flight-time-big">21h25</div><div class="flight-time-label">Fortaleza FOR</div></div>
+      <div class="flight-arrow"><div class="flight-arrow-line"></div><div class="flight-arrow-txt">✈ 3h25</div></div>
+      <div class="flight-time-box"><div class="flight-time-big">0h50</div><div class="flight-time-label">Rio GIG · 27 juil.</div></div>
+    </div>
+    <div class="flight-details-grid">
+      <div class="flight-detail"><div class="flight-detail-label">Type</div><div class="flight-detail-val">Vol direct</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Classe</div><div class="flight-detail-val">Economy</div></div>
+    </div>
+  </div>
+
+  <p class="section-title">Vol 3 · São Paulo → Jericoacoara</p>
+  <div class="flight-big">
+    <div class="flight-big-header">
+      <div>
+        <div class="flight-big-route">✈️ São Paulo GRU → Jijoca de Jericoacoara (JJD)</div>
+        <div class="flight-big-info">LATAM · Opéré par LA · 7 août 2026 · Réf. <strong>FVZDSL</strong></div>
+      </div>
+      <span class="badge badge-ok">Confirmé</span>
+    </div>
+    <div class="flight-times">
+      <div class="flight-time-box"><div class="flight-time-big">8h05</div><div class="flight-time-label">São Paulo GRU</div></div>
+      <div class="flight-arrow"><div class="flight-arrow-line"></div><div class="flight-arrow-txt">✈ 3h25</div></div>
+      <div class="flight-time-box"><div class="flight-time-big">11h30</div><div class="flight-time-label">Jericoacoara JJD</div></div>
+    </div>
+    <div class="flight-details-grid">
+      <div class="flight-detail"><div class="flight-detail-label">Type</div><div class="flight-detail-val">Vol direct</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Classe</div><div class="flight-detail-val">Economy</div></div>
+    </div>
+  </div>
+
+  <p class="section-title">Vol 4 · Retour Fortaleza → Paris</p>
+  <div class="flight-big">
+    <div class="flight-big-header">
+      <div>
+        <div class="flight-big-route">✈️ Fortaleza (FOR) → Paris CDG</div>
+        <div class="flight-big-info">Air France · AF415 · Jeudi 20 août 2026 · Boeing 777-200</div>
+      </div>
+      <span class="badge badge-premium">✨ Premium</span>
+    </div>
+    <div class="flight-times">
+      <div class="flight-time-box"><div class="flight-time-big">19h55</div><div class="flight-time-label">Fortaleza FOR</div></div>
+      <div class="flight-arrow"><div class="flight-arrow-line"></div><div class="flight-arrow-txt">✈ 8h40</div></div>
+      <div class="flight-time-box"><div class="flight-time-big">~10h35</div><div class="flight-time-label">Paris CDG · 21 août</div></div>
+    </div>
+    <div class="flight-details-grid">
+      <div class="flight-detail"><div class="flight-detail-label">Sièges</div><div class="flight-detail-val">11K & 11L Premium ✓</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Classe</div><div class="flight-detail-val">Premium Economy</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Bagages soute</div><div class="flight-detail-val">4× bagages</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Repas</div><div class="flight-detail-val">Petit-déj + Repas · 2× sans gluten</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Bagage main</div><div class="flight-detail-val">4× bagages à main</div></div>
+      <div class="flight-detail"><div class="flight-detail-label">Appareil</div><div class="flight-detail-val">Boeing 777-200</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== À FAIRE ===== -->
+<div id="tab-taches" class="tab-content">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+    <p class="section-title" style="margin:0">Tâches</p>
+    <button class="btn btn-primary btn-sm" onclick="toggleAddTask()">+ Ajouter</button>
+  </div>
+  <div id="add-task-form">
+    <input type="text" id="new-task-text" placeholder="Description…">
+    <div class="form-row">
+      <select id="new-task-stage">
+        <option value="Général">Général</option>
+        <option value="Rio">Rio de Janeiro</option>
+        <option value="Ilha Grande">Ilha Grande</option>
+        <option value="Paraty">Paraty</option>
+        <option value="São Paulo">São Paulo</option>
+        <option value="Jericoacoara">Jericoacoara</option>
+        <option value="Retour">Retour</option>
+      </select>
+      <select id="new-task-priority">
+        <option value="high">🔴 Urgent</option>
+        <option value="med">🟡 Normal</option>
+        <option value="low">🟢 Quand possible</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn btn-primary btn-sm" onclick="addTask()">Ajouter</button>
+      <button class="btn btn-sm" style="background:#f3f4f6" onclick="toggleAddTask()">Annuler</button>
+    </div>
+  </div>
+  <div id="tasks-list"></div>
+</div>
+
+<!-- ===== NOTES ===== -->
+<div id="tab-notes" class="tab-content">
+  <div class="note-form">
+    <div class="form-row">
+      <select id="note-author"><option value="guillaume">Guillaume</option><option value="femme">Valérie</option></select>
+      <select id="note-stage">
+        <option value="Général">Général</option>
+        <option value="Rio">Rio</option>
+        <option value="Ilha Grande">Ilha Grande</option>
+        <option value="Paraty">Paraty</option>
+        <option value="São Paulo">São Paulo</option>
+        <option value="Jericoacoara">Jericoacoara</option>
+        <option value="Retour">Retour</option>
+      </select>
+    </div>
+    <textarea id="note-text" placeholder="Note, idée, adresse, conseil…"></textarea>
+    <button class="btn btn-primary" onclick="addNote()">Publier</button>
+  </div>
+  <div id="notes-list"></div>
+</div>
+
+<!-- ===== DOCUMENTS ===== -->
+<div id="tab-docs" class="tab-content">
+  <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+       ondragover="event.preventDefault();this.classList.add('dragging')"
+       ondragleave="this.classList.remove('dragging')"
+       ondrop="handleDrop(event)">
+    <div style="font-size:2rem">📎</div>
+    <p><strong>Glissez vos documents ici</strong> ou cliquez pour choisir</p>
+    <p style="font-size:.75rem;margin-top:.2rem">Billets, confirmations hôtel, assurance, guides…</p>
+  </div>
+  <input type="file" id="file-input" multiple onchange="handleFiles(this.files)">
+  <div id="docs-list"></div>
+</div>
+
+</main>
+
+<!-- FAB -->
+<button class="fab" id="fab-btn" onclick="toggleModal()" title="Ajouter">+</button>
+
+<!-- MODAL QUICK-ADD -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalIfOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Ajouter…</div>
+
+    <div class="quick-types">
+      <div class="quick-type" onclick="selectType('note')"><span class="qt-icon">📝</span>Une note</div>
+      <div class="quick-type" onclick="selectType('task')"><span class="qt-icon">✅</span>Une tâche</div>
+      <div class="quick-type" onclick="selectType('event')"><span class="qt-icon">📅</span>Un événement</div>
+      <div class="quick-type" onclick="selectType('info')"><span class="qt-icon">ℹ️</span>Une info pratique</div>
+    </div>
+
+    <!-- NOTE FORM -->
+    <div class="modal-form" id="form-note">
+      <div class="form-row">
+        <select id="mn-author"><option value="guillaume">Guillaume</option><option value="femme">Valérie</option></select>
+        <select id="mn-stage">
+          <option value="Général">Général</option><option value="Rio">Rio</option>
+          <option value="Ilha Grande">Ilha Grande</option><option value="Paraty">Paraty</option>
+          <option value="São Paulo">São Paulo</option><option value="Jericoacoara">Jericoacoara</option><option value="Retour">Retour</option>
+        </select>
+      </div>
+      <textarea id="mn-text" placeholder="Votre note, idée, conseil…"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="submitNote()">Publier</button>
+        <button class="btn" style="background:#f3f4f6" onclick="closeModal()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- TASK FORM -->
+    <div class="modal-form" id="form-task">
+      <input type="text" id="mt-text" placeholder="Description de la tâche…">
+      <div class="form-row">
+        <select id="mt-stage">
+          <option value="Général">Général</option><option value="Rio">Rio</option>
+          <option value="Ilha Grande">Ilha Grande</option><option value="Paraty">Paraty</option>
+          <option value="São Paulo">São Paulo</option><option value="Jericoacoara">Jericoacoara</option><option value="Retour">Retour</option>
+        </select>
+        <select id="mt-priority">
+          <option value="high">🔴 Urgent</option>
+          <option value="med">🟡 Normal</option>
+          <option value="low">🟢 Plus tard</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="submitTask()">Ajouter</button>
+        <button class="btn" style="background:#f3f4f6" onclick="closeModal()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- EVENT FORM -->
+    <div class="modal-form" id="form-event">
+      <input type="text" id="me-label" placeholder="Titre de l'événement (ex: Excursion Christ Rédempteur)">
+      <div class="form-row">
+        <input type="date" id="me-date" min="2026-07-26" max="2026-08-21">
+        <select id="me-stage">
+          <option value="ev-rio">Rio</option><option value="ev-ilha">Ilha Grande</option>
+          <option value="ev-paraty">Paraty</option><option value="ev-sp">São Paulo</option>
+          <option value="ev-jeri">Jericoacoara</option><option value="ev-flight">Vol / Transport</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="submitEvent()">Ajouter au calendrier</button>
+        <button class="btn" style="background:#f3f4f6" onclick="closeModal()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- INFO FORM -->
+    <div class="modal-form" id="form-info">
+      <select id="mi-author" style="margin-bottom:.5rem"><option value="guillaume">Guillaume</option><option value="femme">Valérie</option></select>
+      <input type="text" id="mi-title" placeholder="Titre (ex: Restaurant recommandé à Ipanema)">
+      <div class="form-row">
+        <select id="mi-stage">
+          <option value="Général">Général</option><option value="Rio">Rio</option>
+          <option value="Ilha Grande">Ilha Grande</option><option value="Paraty">Paraty</option>
+          <option value="São Paulo">São Paulo</option><option value="Jericoacoara">Jericoacoara</option>
+        </select>
+      </div>
+      <textarea id="mi-text" placeholder="Adresse, lien, numéro de téléphone, conseil…"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="submitInfo()">Enregistrer</button>
+        <button class="btn" style="background:#f3f4f6" onclick="closeModal()">Annuler</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ===== FAB & MODAL =====
+function toggleModal() {
+  const fab = document.getElementById('fab-btn');
+  const overlay = document.getElementById('modal-overlay');
+  const isOpen = overlay.classList.contains('visible');
+  if (isOpen) { closeModal(); } else {
+    overlay.classList.add('visible');
+    fab.classList.add('open');
+    // reset
+    document.querySelectorAll('.quick-type').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('.modal-form').forEach(el => el.classList.remove('visible'));
+  }
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+  document.getElementById('fab-btn').classList.remove('open');
+}
+function closeModalIfOutside(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+function selectType(type) {
+  document.querySelectorAll('.quick-type').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.querySelectorAll('.modal-form').forEach(el => el.classList.remove('visible'));
+  document.getElementById('form-' + type).classList.add('visible');
+}
+
+function submitNote() {
+  const txt = document.getElementById('mn-text').value.trim();
+  if (!txt) return;
+  notes.push({ id: noteId++, author: document.getElementById('mn-author').value, stage: document.getElementById('mn-stage').value, text: txt, date: new Date().toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) });
+  save('notes', notes); save('noteId', noteId);
+  document.getElementById('mn-text').value = '';
+  renderNotes(); closeModal();
+  showTab('notes', document.querySelectorAll('nav button')[4]);
+}
+
+function submitTask() {
+  const txt = document.getElementById('mt-text').value.trim();
+  if (!txt) return;
+  tasks.push({ id: taskId++, text: txt, stage: document.getElementById('mt-stage').value, priority: document.getElementById('mt-priority').value, done: false });
+  save('tasks', tasks); save('taskId', taskId);
+  document.getElementById('mt-text').value = '';
+  renderTasks(); closeModal();
+  showTab('taches', document.querySelectorAll('nav button')[3]);
+}
+
+function submitEvent() {
+  const label = document.getElementById('me-label').value.trim();
+  const date = document.getElementById('me-date').value;
+  if (!label || !date) return;
+  customEvents.push({ date, label, cls: document.getElementById('me-stage').value });
+  save('customEvents', customEvents);
+  // add to events map
+  document.getElementById('me-label').value = '';
+  reloadCustomEvents();
+  renderCalendar(); closeModal();
+  showTab('calendrier', document.querySelectorAll('nav button')[0]);
+}
+
+function submitInfo() {
+  const title = document.getElementById('mi-title').value.trim();
+  const txt = document.getElementById('mi-text').value.trim();
+  if (!title && !txt) return;
+  const full = title ? `📌 **${title}**\n${txt}` : txt;
+  notes.push({ id: noteId++, author: document.getElementById('mi-author').value, stage: document.getElementById('mi-stage').value, text: full, date: new Date().toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) });
+  save('notes', notes); save('noteId', noteId);
+  document.getElementById('mi-title').value = '';
+  document.getElementById('mi-text').value = '';
+  renderNotes(); closeModal();
+  showTab('notes', document.querySelectorAll('nav button')[4]);
+}
+
+// ===== TABS =====
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== STORAGE =====
+function save(k,v){try{localStorage.setItem('bres_'+k,JSON.stringify(v))}catch(e){}}
+function load(k,d){try{const v=localStorage.getItem('bres_'+k);return v?JSON.parse(v):d}catch(e){return d}}
+
+// ===== CALENDAR =====
+const events = {
+  // July
+  '2026-07-26': [{cls:'ev-flight', label:'✈ AF416 départ 13h40'}],
+  '2026-07-27': [{cls:'ev-flight', label:'✈ Arrivée Rio 0h50'},{cls:'ev-rio', label:'🏖 Rio · Ipanema'}],
+  '2026-07-28': [{cls:'ev-rio', label:'🏖 Rio · Ipanema'}],
+  '2026-07-29': [{cls:'ev-rio', label:'🏖 Rio · Ipanema'}],
+  '2026-07-30': [{cls:'ev-rio', label:'🏖 Rio · Ipanema'}],
+  '2026-07-31': [{cls:'ev-rio', label:'🏖 Rio → Ilha Grande'},{cls:'ev-ilha', label:'🏝 Ilha Grande'}],
+  // August
+  '2026-08-01': [{cls:'ev-ilha', label:'🏝 Ilha Grande'}],
+  '2026-08-02': [{cls:'ev-ilha', label:'🏝 Ilha Grande'}],
+  '2026-08-03': [{cls:'ev-ilha', label:'🏝 Ilha → Paraty'},{cls:'ev-paraty', label:'🏛 Paraty'}],
+  '2026-08-04': [{cls:'ev-paraty', label:'🏛 Paraty'}],
+  '2026-08-05': [{cls:'ev-paraty', label:'🏛 Paraty'}],
+  '2026-08-06': [{cls:'ev-paraty', label:'🏛 Paraty → São Paulo'},{cls:'ev-sp', label:'🌆 Comfort Hotel GRU'}],
+  '2026-08-07': [{cls:'ev-flight', label:'✈ GRU→JJD 8h05'},{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-08': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-09': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-10': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-11': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-12': [{cls:'ev-jeri', label:'⛺ Glamping · Camocim'}],
+  '2026-08-13': [{cls:'ev-jeri', label:'🌊 Curimas'}],
+  '2026-08-14': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-15': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-16': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-17': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-18': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-19': [{cls:'ev-jeri', label:'🏜 Tatajuba'}],
+  '2026-08-20': [{cls:'ev-flight', label:'✈ AF415 → Paris 19h55'}],
+  '2026-08-21': [{cls:'ev-flight', label:'✈ Arrivée Paris ~10h35'}],
+};
+
+function pad(n){return String(n).padStart(2,'0');}
+function renderCalendar() {
+  const root = document.getElementById('calendar-root');
+  const months = [{year:2026,month:7,name:'Juillet 2026'},{year:2026,month:8,name:'Août 2026'}];
+  const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  let html = '';
+  months.forEach(({year,month,name}) => {
+    const firstDay = new Date(year, month-1, 1);
+    const totalDays = new Date(year, month, 0).getDate();
+    let startDow = firstDay.getDay(); // 0=Sun
+    if (startDow === 0) startDow = 7; // make Mon=1
+    html += `<div class="cal-month"><div class="cal-month-header">${name}</div><div class="cal-grid">`;
+    days.forEach(d => { html += `<div class="cal-day-header">${d}</div>`; });
+    for (let i = 1; i < startDow; i++) { html += `<div class="cal-day empty"></div>`; }
+    for (let d = 1; d <= totalDays; d++) {
+      const key = `${year}-${pad(month)}-${pad(d)}`;
+      const evs = events[key] || [];
+      const isToday = (new Date().toISOString().slice(0,10) === key);
+      html += `<div class="cal-day ${evs.length?'has-event':''} ${isToday?'today':''}">`;
+      html += `<div class="cal-day-num">${d}</div>`;
+      evs.forEach(ev => { html += `<div class="cal-event ${ev.cls}">${ev.label}</div>`; });
+      html += `</div>`;
+    }
+    html += `</div></div>`;
+  });
+  root.innerHTML = html;
+}
+let customEvents = load('customEvents', []);
+function reloadCustomEvents() {
+  customEvents = load('customEvents', []);
+  customEvents.forEach(ev => {
+    if (!events[ev.date]) events[ev.date] = [];
+    if (!events[ev.date].find(e => e.label === ev.label)) events[ev.date].push({ cls: ev.cls, label: ev.label });
+  });
+}
+reloadCustomEvents();
+renderCalendar();
+
+// ===== TASKS =====
+const defaultTasks = [
+  {id:1,text:'Réserver transfert aéroport GIG → Ipanema (arrivée 27 juil. ~0h50)',stage:'Rio',priority:'high',done:false},
+  {id:2,text:'Organiser ferry Angra dos Reis → Ilha Grande (31 juil.)',stage:'Ilha Grande',priority:'high',done:false},
+  {id:3,text:'Sélectionner les sièges AF416 Paris → Fortaleza',stage:'Général',priority:'med',done:false},
+  {id:4,text:'Confirmer logement Paraty nuits du 4 et 5 août',stage:'Paraty',priority:'high',done:false},
+  {id:14,text:'Réserver le bateau retour Ponta Negra → Paraty (5 août, haute saison — à anticiper)',stage:'Paraty',priority:'high',done:false},
+  {id:5,text:'Organiser transfert Paraty → São Paulo GRU (6 août, ~5h)',stage:'São Paulo',priority:'high',done:false},
+  {id:6,text:'Réserver hôtel près aéroport GRU nuit du 6 août',stage:'São Paulo',priority:'high',done:false},
+  {id:7,text:'Organiser transfert JJD → Tatajuba (7 août après 11h30)',stage:'Jericoacoara',priority:'med',done:false},
+  {id:8,text:'Confirmer logement Tatajuba',stage:'Jericoacoara',priority:'high',done:false},
+  {id:9,text:'Organiser transfert Jericoacoara → Fortaleza (avant 20 août)',stage:'Retour',priority:'high',done:false},
+  {id:10,text:'Assurance voyage — vérifier couverture Brésil',stage:'Général',priority:'med',done:false},
+  {id:11,text:'Vérifier validité des passeports',stage:'Général',priority:'med',done:false},
+  {id:12,text:'SIM / eSIM data Brésil',stage:'Général',priority:'low',done:false},
+  {id:13,text:'Prévoir reais brésiliens ou retrait sur place',stage:'Général',priority:'low',done:false},
+];
+let tasks = load('tasks', defaultTasks);
+let taskId = load('taskId', defaultTasks.length+1);
+
+function renderTasks() {
+  const stages = ['Général','Rio','Ilha Grande','Paraty','São Paulo','Jericoacoara','Retour'];
+  const pOrd = {high:0,med:1,low:2};
+  let html = '';
+  stages.forEach(s => {
+    const st = tasks.filter(t => t.stage===s);
+    if (!st.length) return;
+    html += `<p class="section-title">${s}</p>`;
+    st.sort((a,b)=>pOrd[a.priority]-pOrd[b.priority]).forEach(t => {
+      html += `<div class="task-item ${t.done?'done':''}" onclick="toggleTask(${t.id})">
+        <div class="task-priority p-${t.priority}"></div>
+        <div class="task-check">${t.done?'✓':''}</div>
+        <div class="task-text">${t.text}</div>
+        <button class="btn btn-del btn-sm" onclick="event.stopPropagation();delTask(${t.id})">✕</button>
+      </div>`;
+    });
+  });
+  document.getElementById('tasks-list').innerHTML = html || '<div class="empty-state"><span>✅</span>Toutes les tâches sont faites !</div>';
+}
+function toggleTask(id){const t=tasks.find(t=>t.id===id);if(t){t.done=!t.done;save('tasks',tasks);renderTasks();}}
+function delTask(id){tasks=tasks.filter(t=>t.id!==id);save('tasks',tasks);renderTasks();}
+function toggleAddTask(){document.getElementById('add-task-form').classList.toggle('visible');}
+function addTask(){
+  const txt=document.getElementById('new-task-text').value.trim();
+  if(!txt)return;
+  tasks.push({id:taskId++,text:txt,stage:document.getElementById('new-task-stage').value,priority:document.getElementById('new-task-priority').value,done:false});
+  save('tasks',tasks);save('taskId',taskId);
+  document.getElementById('new-task-text').value='';
+  document.getElementById('add-task-form').classList.remove('visible');
+  renderTasks();
+}
+renderTasks();
+
+// ===== NOTES =====
+const defaultNotes = [
+  {
+    id:1,
+    author:'guillaume',
+    stage:'Rio',
+    date:'Tips d\'une amie',
+    text:`🌅 Être à 6h à Arpoador pour voir les premiers surfeurs et le soleil se lever : spot parfait entre Copacabana et Ipanema\n☕ Petit-déjeuner tôt sur la terrasse de l'hôtel Arpoador avec vue imprenable sur Ipanema\n🎶 Soirée "Roda de Samba" dans le quartier de Lapa\n🍽️ Déjeuner sur le fort au bout de la jetée — Confeitaria Colombo : vue imprenable sur Copacabana\n🏘️ Quartier Santa Teresa avec un guide (pour mieux comprendre) + passage à l'ancienne bibliothèque de Rio\n✝️ Christ Rédempteur + Pain de Sucre : réserver à l'avance sur le site, y aller le plus tôt possible — incontournables, la vue est magistrale\n🏖️ Après le Pain de Sucre en téléphérique : Praia Vermelha juste en dessous, très mignonne\n🥾 Ascension des 2 Frères (Dois Irmãos) avec Augusto en passant par la favela\n🍽️ Restaurant Zaza Bistrot Café au 1er étage de la librairie\n🛍️ La plus grande boutique Farm Rio de Rio (derrière Ipanema)\n🚲 Louer des vélos : Copacabana → Leblon en passant par le grand lac + stop au jardin botanique`
+  }
+];
+let notes = load('notes', defaultNotes);
+let noteId = load('noteId', 2);
+function renderNotes(){
+  const el=document.getElementById('notes-list');
+  if(!notes.length){el.innerHTML='<div class="empty-state"><span>📝</span>Pas encore de notes !</div>';return;}
+  el.innerHTML=[...notes].reverse().map(n=>`
+    <div class="note-item">
+      <div class="note-meta">
+        <span class="note-author ${n.author}">${n.author==='guillaume'?'Guillaume':n.author==='femme'?'Valérie':'💌 Amie'}</span>
+        <span class="note-date">${n.date}</span>
+        <span class="note-stage">${n.stage}</span>
+        <button class="btn btn-del btn-sm" onclick="delNote(${n.id})" style="margin-left:auto">✕</button>
+      </div>
+      <div class="note-text">${n.text.replace(/\n/g,'<br>')}</div>
+    </div>`).join('');
+}
+function addNote(){
+  const txt=document.getElementById('note-text').value.trim();
+  if(!txt)return;
+  notes.push({id:noteId++,author:document.getElementById('note-author').value,stage:document.getElementById('note-stage').value,text:txt,date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
+  save('notes',notes);save('noteId',noteId);
+  document.getElementById('note-text').value='';
+  renderNotes();
+}
+function delNote(id){notes=notes.filter(n=>n.id!==id);save('notes',notes);renderNotes();}
+renderNotes();
+
+// ===== DOCS =====
+let docs = load('docs',[]);
+let docId = load('docId',1);
+function fileIcon(n){const e=n.split('.').pop().toLowerCase();return{pdf:'📄',jpg:'🖼️',jpeg:'🖼️',png:'🖼️',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',zip:'🗜️'}[e]||'📎';}
+function fmtSize(b){if(b<1024)return b+'o';if(b<1048576)return(b/1024).toFixed(1)+'Ko';return(b/1048576).toFixed(1)+'Mo';}
+function renderDocs(){
+  const el=document.getElementById('docs-list');
+  if(!docs.length){el.innerHTML='<div class="empty-state"><span>📎</span>Aucun document</div>';return;}
+  el.innerHTML=docs.map(d=>`
+    <div class="doc-item">
+      <div class="doc-icon">${fileIcon(d.name)}</div>
+      <div class="doc-info"><div class="doc-name">${d.name}</div><div class="doc-meta">${d.size} · ${d.date}</div></div>
+      <div style="display:flex;gap:.4rem">
+        <a href="${d.data}" download="${d.name}" class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;text-decoration:none">⬇️</a>
+        <button class="btn btn-del btn-sm" onclick="delDoc(${d.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+function handleFiles(files){
+  Array.from(files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{docs.push({id:docId++,name:f.name,size:fmtSize(f.size),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'short'}),data:e.target.result});save('docs',docs);save('docId',docId);renderDocs();};
+    r.readAsDataURL(f);
+  });
+}
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('dragging');handleFiles(e.dataTransfer.files);}
+function delDoc(id){docs=docs.filter(d=>d.id!==id);save('docs',docs);renderDocs();}
+renderDocs();
+</script>
+</body>
+</html>
