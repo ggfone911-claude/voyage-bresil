@@ -311,10 +311,10 @@
             <div><div class="etape-location">Paraty</div><div class="etape-dates">3 août → 6 août · 3 nuits</div></div>
           </div>
           <div class="card-body">
-            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Nuit 3/4</span><span class="info-val">Pousada do Ouros <span class="badge badge-ok">Confirmé</span></span></div>
+            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Nuit 3/4</span><span class="info-val">Pousada do Ouro <span class="badge badge-ok">Confirmé</span></span></div>
             <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Nuit 4/5</span><span class="info-val">Cultura Caiçara Ponta Negra <span class="badge badge-ok">Réservé</span><br><small style="color:var(--muted)">Praia de Ponta Negra, Paraty · Check-in 4 août 14h-18h · Check-out 5 août 08h-12h</small></span></div>
             <div class="info-row"><span class="info-icon">🚶</span><span class="info-label">Accès</span><span class="info-val">Aller à pied depuis Paraty · Retour en bateau</span></div>
-            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Nuit 5/6</span><span class="info-val">Pousada do Ouros <span class="badge badge-ok">Confirmé</span></span></div>
+            <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Nuit 5/6</span><span class="info-val">Pousada do Ouro <span class="badge badge-ok">Confirmé</span></span></div>
           </div>
         </div>
       </div>
@@ -546,7 +546,7 @@
     <div class="card">
       <div class="card-body" style="padding:.8rem">
         <div class="info-row"><span class="info-icon">✈️</span><span class="info-label">Vols</span><span class="info-val">Billets AF416, AF415, LATAM GIG, LATAM GRU</span></div>
-        <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Hôtels</span><span class="info-val">Confirmations Ipanema, Atlantica, Pousada do Ouros, Cultura Caiçara, Comfort GRU</span></div>
+        <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Hôtels</span><span class="info-val">Confirmations Ipanema, Atlantica, Pousada do Ouro, Cultura Caiçara, Comfort GRU</span></div>
         <div class="info-row"><span class="info-icon">🛡️</span><span class="info-label">Assurance</span><span class="info-val">Police d'assurance voyage</span></div>
         <div class="info-row"><span class="info-icon">🛂</span><span class="info-label">Passeports</span><span class="info-val">Scan recto-verso</span></div>
         <div class="info-row"><span class="info-icon">📋</span><span class="info-label">Santé</span><span class="info-val">Carnet de vaccinations, ordonnances</span></div>
@@ -799,6 +799,53 @@ const events = {
 function pad(n){return String(n).padStart(2,'0');}
 // ===== PROGRAMMES JOUR PAR JOUR =====
 const dayPrograms = {
+  '2026-08-06': {
+    title: 'Jour 11 · Paraty → São Paulo',
+    sub: 'Transfert vers l\'aéroport',
+    content: `🚗 TRANSFERT PRIVÉ :
+Paraty → São Paulo Guarulhos (GRU) · ~5h de route
+
+🏨 ARRIVÉE :
+Comfort Hotel Guarulhos Aeroporto
+Check-in · Repos
+
+✈️ DEMAIN MATIN :
+Vol São Paulo GRU → Jericoacoara
+
+✅ À ORGANISER :
+⭐ Réserver transfert privé Paraty → GRU (prévoir départ matin pour arriver en début d'après-midi)`
+  },
+  '2026-08-03': {
+    title: 'Jour 8 · Ilha Grande → Paraty',
+    sub: 'Arrivée à Paraty',
+    content: `🌅 MATIN :
+Petit-déjeuner au lodge
+🚤 Transfert organisé par Atlantica Jungle Lodge → Paraty
+(le lodge gère tout)
+
+🏨 MIDI :
+Installation à la Pousada do Ouro
+
+☀️ APRÈS-MIDI :
+Balade dans le centre historique
+• Galeries d'art
+• Boutiques
+• Ruelles pavées
+
+🌙 SOIR :
+🍽️ Dîner au Banana da Terra`
+  },
+  '2026-08-01': {
+    title: 'Jour 6 · Ilha Grande',
+    sub: 'Mode savane 🦁',
+    content: `🏖️ Plage du lodge
+🌴 Hamac
+☀️ Farniente
+🌊 Baignade
+
+Journée off — pas de programme, pas de logistique.
+Profitez.`
+  },
   '2026-08-02': {
     title: 'Jour 7 · Ilha Grande',
     sub: 'Mer & snorkeling',
@@ -1146,7 +1193,7 @@ function initMap(){
       { latlng:[-3.7172,-38.5433], label:'Fortaleza',          date:'26 juil · escale + vol LATAM → Rio', color:'#002776', icon:'✈️' },
       { latlng:[-22.9867,-43.1927],label:'Rio de Janeiro',     date:'26 → 31 juil · Ipanema',  color:'#009c3b', icon:'🏖️' },
       { latlng:[-23.1542,-44.1989],label:'Ilha Grande',        date:'31 juil → 3 août · Atlantica Jungle Lodge', color:'#009c3b', icon:'🌴' },
-      { latlng:[-23.2178,-44.7131],label:'Paraty',             date:'3 → 6 août · Pousada do Ouros + Cultura Caiçara', color:'#009c3b', icon:'⛵' },
+      { latlng:[-23.2178,-44.7131],label:'Paraty',             date:'3 → 6 août · Pousada do Ouro + Cultura Caiçara', color:'#009c3b', icon:'⛵' },
       { latlng:[-23.4356,-46.4731],label:'São Paulo (Guarulhos)',date:'6 → 7 août · Comfort Hotel', color:'#009c3b', icon:'🏨' },
       { latlng:[-2.7033,-40.3833], label:'Tatajuba',           date:'7 → 12 août',             color:'#e05a00', icon:'🌊' },
       { latlng:[-2.9019,-40.8431], label:'Camocim (Glamping)', date:'12 août',                 color:'#e05a00', icon:'⛺' },
