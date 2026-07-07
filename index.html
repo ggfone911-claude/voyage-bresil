@@ -528,7 +528,7 @@
     <div style="font-size:3rem;margin-bottom:.8rem">📁</div>
     <h3 style="font-size:1.1rem;font-weight:700;color:var(--blue);margin-bottom:.4rem">Dossier Google Drive partagé</h3>
     <p style="font-size:.85rem;color:var(--muted);margin-bottom:1.4rem">Billets, confirmations hôtel, assurance, passeports…<br>Accessible depuis tous vos appareils en temps réel.</p>
-    <a id="drive-link" href="https://drive.google.com/drive/my-drive" target="_blank"
+    <a id="drive-link" href="https://drive.google.com/drive/folders/1ztxz5t5anrugbGZBCXwpl6gxAAaC4gUp?usp=drive_link" target="_blank"
        style="display:inline-block;background:#009c3b;color:white;padding:.75rem 1.6rem;border-radius:10px;font-weight:600;font-size:.9rem;text-decoration:none;transition:opacity .2s"
        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       📂 Ouvrir le dossier Drive
@@ -799,6 +799,29 @@ const events = {
 function pad(n){return String(n).padStart(2,'0');}
 // ===== PROGRAMMES JOUR PAR JOUR =====
 const dayPrograms = {
+  '2026-07-31': {
+    title: 'Jour 5 · Rio → Ilha Grande',
+    sub: 'Transfert & arrivée',
+    content: `🏨 CHECK-OUT hôtel Ipanema — 11h
+
+🚐 TRANSFERT — Navette partagée tout-en-un :
+Pickup à l'hôtel ~10h → van jusqu'à Angra dos Reis (~2h30) → bateau jusqu'à Abraão (~1h30)
+Arrivée Ilha Grande ~15h · ~70$/personne
+
+📍 Réserver sur :
+• GetYourGuide : Rio → Ilha Grande shuttle
+• Ou Ilha Grande Hiking : ilhagrandehiking.com
+
+⛴️ FERRIES publics (si trajet séparé) :
+Angra dos Reis → Abraão : 10h30 · 11h30 · 12h30 · 13h30 · 15h · 16h · 17h · 18h30
+Durée traversée : 30 min · ~20$/pers
+
+🏝️ ARRIVÉE Abraão — Atlantica Jungle Lodge
+Check-in · Installation · Première balade sur la plage
+
+✅ À ORGANISER :
+⭐ Réserver la navette partagée Rio → Ilha Grande`
+  },
   '2026-07-30': {
     title: 'Jour 4 · Rio de Janeiro',
     sub: 'Rio Nature',
@@ -944,6 +967,7 @@ renderCalendar();
 
 // ===== TASKS =====
 const defaultTasks = [
+  {id:15,text:'Réserver navette partagée Rio (Ipanema) → Ilha Grande — 31 juil. départ 10h (~70$/pers) · GetYourGuide ou ilhagrandehiking.com',stage:'Ilha Grande',priority:'high',done:false},
   {id:1,text:'Réserver transfert aéroport GIG → Ipanema (arrivée 27 juil. ~0h50)',stage:'Rio',priority:'high',done:false},
   {id:2,text:'Organiser ferry Angra dos Reis → Ilha Grande (31 juil.)',stage:'Ilha Grande',priority:'high',done:false},
   {id:3,text:'Sélectionner les sièges AF416 Paris → Fortaleza',stage:'Général',priority:'med',done:false},
