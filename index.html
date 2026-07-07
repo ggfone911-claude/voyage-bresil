@@ -511,16 +511,35 @@
 
 <!-- ===== DOCUMENTS ===== -->
 <div id="tab-docs" class="tab-content">
-  <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
-       ondragover="event.preventDefault();this.classList.add('dragging')"
-       ondragleave="this.classList.remove('dragging')"
-       ondrop="handleDrop(event)">
-    <div style="font-size:2rem">📎</div>
-    <p><strong>Glissez vos documents ici</strong> ou cliquez pour choisir</p>
-    <p style="font-size:.75rem;margin-top:.2rem">Billets, confirmations hôtel, assurance, guides…</p>
+  <div class="card" style="text-align:center;padding:2rem 1.5rem">
+    <div style="font-size:3rem;margin-bottom:.8rem">📁</div>
+    <h3 style="font-size:1.1rem;font-weight:700;color:var(--blue);margin-bottom:.4rem">Dossier Google Drive partagé</h3>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:1.4rem">Billets, confirmations hôtel, assurance, passeports…<br>Accessible depuis tous vos appareils en temps réel.</p>
+    <a id="drive-link" href="https://drive.google.com/drive/my-drive" target="_blank"
+       style="display:inline-block;background:#009c3b;color:white;padding:.75rem 1.6rem;border-radius:10px;font-weight:600;font-size:.9rem;text-decoration:none;transition:opacity .2s"
+       onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      📂 Ouvrir le dossier Drive
+    </a>
+    <div style="margin-top:1.2rem;padding:1rem;background:var(--light);border-radius:10px;text-align:left;font-size:.8rem;color:var(--muted)">
+      <strong style="color:var(--text)">⚙️ Pour configurer :</strong><br>
+      1. Crée un dossier "Voyage Brésil 2026" sur Google Drive<br>
+      2. Partage-le avec Valérie<br>
+      3. Copie le lien et transmets-le moi pour que je l'intègre ici
+    </div>
   </div>
-  <input type="file" id="file-input" multiple onchange="handleFiles(this.files)">
-  <div id="docs-list"></div>
+
+  <div style="margin-top:1rem">
+    <h4 style="font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.05em">Documents clés à y déposer</h4>
+    <div class="card">
+      <div class="card-body" style="padding:.8rem">
+        <div class="info-row"><span class="info-icon">✈️</span><span class="info-label">Vols</span><span class="info-val">Billets AF416, AF415, LATAM GIG, LATAM GRU</span></div>
+        <div class="info-row"><span class="info-icon">🏨</span><span class="info-label">Hôtels</span><span class="info-val">Confirmations Ipanema, Atlantica, Pousada do Ouros, Cultura Caiçara, Comfort GRU</span></div>
+        <div class="info-row"><span class="info-icon">🛡️</span><span class="info-label">Assurance</span><span class="info-val">Police d'assurance voyage</span></div>
+        <div class="info-row"><span class="info-icon">🛂</span><span class="info-label">Passeports</span><span class="info-val">Scan recto-verso</span></div>
+        <div class="info-row"><span class="info-icon">📋</span><span class="info-label">Santé</span><span class="info-val">Carnet de vaccinations, ordonnances</span></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ===== CARTE ===== -->
