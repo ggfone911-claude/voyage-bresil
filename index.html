@@ -801,26 +801,23 @@ function pad(n){return String(n).padStart(2,'0');}
 const dayPrograms = {
   '2026-07-31': {
     title: 'Jour 5 · Rio → Ilha Grande',
-    sub: 'Transfert & arrivée',
+    sub: 'Arrivée directe au lodge',
     content: `🏨 CHECK-OUT hôtel Ipanema — 11h
+Objectif : éviter la logistique pénible
 
-🚐 TRANSFERT — Navette partagée tout-en-un :
-Pickup à l'hôtel ~10h → van jusqu'à Angra dos Reis (~2h30) → bateau jusqu'à Abraão (~1h30)
-Arrivée Ilha Grande ~15h · ~70$/personne
+🚗 TRANSFERT PRIVÉ :
+Voiture privée Rio → Angra dos Reis (~2h30)
+↓
+⛵ Bateau direct vers Atlantica Jungle Lodge
+(sans passer par Abraão)
 
-📍 Réserver sur :
-• GetYourGuide : Rio → Ilha Grande shuttle
-• Ou Ilha Grande Hiking : ilhagrandehiking.com
-
-⛴️ FERRIES publics (si trajet séparé) :
-Angra dos Reis → Abraão : 10h30 · 11h30 · 12h30 · 13h30 · 15h · 16h · 17h · 18h30
-Durée traversée : 30 min · ~20$/pers
-
-🏝️ ARRIVÉE Abraão — Atlantica Jungle Lodge
-Check-in · Installation · Première balade sur la plage
+🏝️ ARRIVÉE AU LODGE :
+• Installation
+• Déjeuner / plage du lodge
+• Petite marche vers Lopes Mendes si énergie
 
 ✅ À ORGANISER :
-⭐ Réserver la navette partagée Rio → Ilha Grande`
+⭐ Réserver transfert privé complet Rio → Atlantica Jungle Lodge (voiture + bateau direct)`
   },
   '2026-07-30': {
     title: 'Jour 4 · Rio de Janeiro',
@@ -967,7 +964,7 @@ renderCalendar();
 
 // ===== TASKS =====
 const defaultTasks = [
-  {id:15,text:'Réserver navette partagée Rio (Ipanema) → Ilha Grande — 31 juil. départ 10h (~70$/pers) · GetYourGuide ou ilhagrandehiking.com',stage:'Ilha Grande',priority:'high',done:false},
+  {id:15,text:'Réserver transfert privé complet Rio (Ipanema) → Atlantica Jungle Lodge — 31 juil. (voiture privée + bateau direct vers le lodge)',stage:'Ilha Grande',priority:'high',done:false},
   {id:1,text:'Réserver transfert aéroport GIG → Ipanema (arrivée 27 juil. ~0h50)',stage:'Rio',priority:'high',done:false},
   {id:2,text:'Organiser ferry Angra dos Reis → Ilha Grande (31 juil.)',stage:'Ilha Grande',priority:'high',done:false},
   {id:3,text:'Sélectionner les sièges AF416 Paris → Fortaleza',stage:'Général',priority:'med',done:false},
