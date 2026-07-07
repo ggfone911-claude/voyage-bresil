@@ -799,17 +799,35 @@ const events = {
 function pad(n){return String(n).padStart(2,'0');}
 // ===== PROGRAMMES JOUR PAR JOUR =====
 const dayPrograms = {
+  '2026-08-02': {
+    title: 'Jour 7 · Ilha Grande',
+    sub: 'Mer & snorkeling',
+    content: `🎯 Objectif : voir le meilleur de l'île sans courir
+
+⛵ BATEAU PRIVÉ OU SEMI-PRIVÉ :
+À organiser via le lodge (demander à la réception)
+Spots selon météo :
+• Lagoa Azul
+• Lagoa Verde
+• Plages secrètes accessibles uniquement par mer
+
+🤿 Masque/tuba recommandé (disponible au lodge)
+🧴 Crème solaire corail-safe obligatoire
+
+🏠 Retour au lodge en fin d'après-midi`
+  },
   '2026-07-31': {
     title: 'Jour 5 · Rio → Ilha Grande',
     sub: 'Arrivée directe au lodge',
     content: `🏨 CHECK-OUT hôtel Ipanema — 11h
 Objectif : éviter la logistique pénible
 
-🚗 TRANSFERT PRIVÉ :
-Voiture privée Rio → Angra dos Reis (~2h30)
-↓
-⛵ Bateau direct vers Atlantica Jungle Lodge
-(sans passer par Abraão)
+🚗 TRANSFERT PRIVÉ — organisé par le lodge :
+📧 reservas@atlanticajunglelodge.com.br (à contacter au moins 3j avant)
+Taxi depuis hôtel Ipanema → port Conceição de Jacareí (~2h30)
+↓ Speedboat 30 min → directement au lodge
+💰 R$ 800 total (jusqu'à 4 personnes) = R$400 taxi + R$400 water taxi
+⏰ Départ Rio ~9h30 · Arrivée recommandée 12h-15h (check-in 13h)
 
 🏝️ ARRIVÉE AU LODGE :
 • Installation
@@ -817,7 +835,7 @@ Voiture privée Rio → Angra dos Reis (~2h30)
 • Petite marche vers Lopes Mendes si énergie
 
 ✅ À ORGANISER :
-⭐ Réserver transfert privé complet Rio → Atlantica Jungle Lodge (voiture + bateau direct)`
+⭐ Envoyer mail au lodge pour réserver le transfert privé`
   },
   '2026-07-30': {
     title: 'Jour 4 · Rio de Janeiro',
@@ -964,7 +982,7 @@ renderCalendar();
 
 // ===== TASKS =====
 const defaultTasks = [
-  {id:15,text:'Réserver transfert privé complet Rio (Ipanema) → Atlantica Jungle Lodge — 31 juil. (voiture privée + bateau direct vers le lodge)',stage:'Ilha Grande',priority:'high',done:false},
+  {id:15,text:'Réserver transfert privé Rio → lodge via reservas@atlanticajunglelodge.com.br (R$800 total, 3j avant min.) · départ ~9h30 le 31 juil.',stage:'Ilha Grande',priority:'high',done:false},
   {id:1,text:'Réserver transfert aéroport GIG → Ipanema (arrivée 27 juil. ~0h50)',stage:'Rio',priority:'high',done:false},
   {id:2,text:'Organiser ferry Angra dos Reis → Ilha Grande (31 juil.)',stage:'Ilha Grande',priority:'high',done:false},
   {id:3,text:'Sélectionner les sièges AF416 Paris → Fortaleza',stage:'Général',priority:'med',done:false},
