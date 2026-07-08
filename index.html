@@ -122,6 +122,14 @@
   .task-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .65rem; transition: all .15s; margin-top: 1px; }
   .task-item.done .task-check { background: #10b981; border-color: #10b981; color: white; }
   .task-item.done .task-text { text-decoration: line-through; color: var(--muted); }
+  .task-assignee { flex-shrink:0; font-size:.65rem; font-weight:700; border-radius:999px; padding:.15rem .45rem; cursor:pointer; border:none; margin-top:1px; transition:opacity .15s; }
+  .task-assignee:hover { opacity:.75; }
+  .ta-g  { background:#dbeafe; color:#1d4ed8; }
+  .ta-v  { background:#fce7f3; color:#be185d; }
+  .ta-tous { background:#f3f4f6; color:#4b5563; }
+  .task-filter { display:flex; gap:.4rem; margin-bottom:.75rem; flex-wrap:wrap; }
+  .task-filter button { font-size:.75rem; padding:.3rem .75rem; border-radius:999px; border:1.5px solid var(--border); background:white; cursor:pointer; font-weight:600; transition:all .15s; }
+  .task-filter button.active { border-color:var(--blue); color:var(--blue); background:#eff6ff; }
   .resa-item { display:flex; align-items:center; gap:.55rem; padding:.4rem .2rem; font-size:.85rem; cursor:pointer; border-radius:6px; transition:background .15s; }
   .resa-item:hover { background:#f9fafb; }
   .resa-item input[type=checkbox] { width:16px; height:16px; accent-color: var(--green); cursor:pointer; flex-shrink:0; }
@@ -477,9 +485,14 @@
 
 <!-- ===== À FAIRE ===== -->
 <div id="tab-taches" class="tab-content">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
     <p class="section-title" style="margin:0">Tâches</p>
     <button class="btn btn-primary btn-sm" onclick="toggleAddTask()">+ Ajouter</button>
+  </div>
+  <div class="task-filter">
+    <button class="active" onclick="setTaskFilter('tous',this)">👥 Tous</button>
+    <button onclick="setTaskFilter('g',this)">🧑 Guillaume</button>
+    <button onclick="setTaskFilter('v',this)">👩 Valérie</button>
   </div>
   <div id="add-task-form">
     <input type="text" id="new-task-text" placeholder="Description…">
@@ -497,6 +510,13 @@
         <option value="high">🔴 Urgent</option>
         <option value="med">🟡 Normal</option>
         <option value="low">🟢 Quand possible</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <select id="new-task-assignee">
+        <option value="tous">👥 Guillaume + Valérie</option>
+        <option value="g">🧑 Guillaume</option>
+        <option value="v">👩 Valérie</option>
       </select>
     </div>
     <div style="display:flex;gap:.5rem">
@@ -1167,38 +1187,53 @@ renderCalendar();
 
 // ===== TASKS =====
 const defaultTasks = [
-  {id:15,text:'Réserver transfert privé Rio → lodge via reservas@atlanticajunglelodge.com.br (R$800 total, 3j avant min.) · départ ~9h30 le 31 juil.',stage:'Ilha Grande',priority:'high',done:false},
-  {id:1,text:'Réserver transfert aéroport GIG → Ipanema (arrivée 27 juil. ~0h50)',stage:'Rio',priority:'high',done:false},
-  {id:2,text:'Organiser ferry Angra dos Reis → Ilha Grande (31 juil.)',stage:'Ilha Grande',priority:'high',done:false},
-  {id:3,text:'Sélectionner les sièges AF416 Paris → Fortaleza',stage:'Général',priority:'med',done:false},
-  {id:4,text:'Confirmer logement Paraty nuits du 4 et 5 août',stage:'Paraty',priority:'high',done:true},
-  {id:14,text:'Réserver le bateau retour Ponta Negra → Paraty (5 août, haute saison — à anticiper)',stage:'Paraty',priority:'high',done:false},
-  {id:5,text:'Organiser transfert Paraty → São Paulo GRU (6 août, ~5h)',stage:'São Paulo',priority:'high',done:false},
-  {id:6,text:'Réserver hôtel près aéroport GRU nuit du 6 août',stage:'São Paulo',priority:'high',done:false},
-  {id:7,text:'Organiser transfert JJD → Tatajuba (7 août après 11h30)',stage:'Jericoacoara',priority:'med',done:false},
-  {id:8,text:'Confirmer logement Tatajuba',stage:'Jericoacoara',priority:'high',done:false},
-  {id:9,text:'Organiser transfert Jericoacoara → Fortaleza (avant 20 août)',stage:'Retour',priority:'high',done:false},
-  {id:10,text:'Assurance voyage — vérifier couverture Brésil',stage:'Général',priority:'med',done:false},
-  {id:11,text:'Vérifier validité des passeports',stage:'Général',priority:'med',done:false},
-  {id:12,text:'SIM / eSIM data Brésil',stage:'Général',priority:'low',done:false},
-  {id:13,text:'Prévoir reais brésiliens ou retrait sur place',stage:'Général',priority:'low',done:false},
+  {id:15,text:'Réserver transfert privé Rio → lodge via reservas@atlanticajunglelodge.com.br (R$800 total, 3j avant min.) · départ ~9h30 le 31 juil.',stage:'Ilha Grande',priority:'high',done:false,assignee:'g'},
+  {id:1,text:'Réserver transfert aéroport GIG → Ipanema (arrivée 27 juil. ~0h50)',stage:'Rio',priority:'high',done:false,assignee:'g'},
+  {id:2,text:'Organiser ferry Angra dos Reis → Ilha Grande (31 juil.)',stage:'Ilha Grande',priority:'high',done:false,assignee:'g'},
+  {id:3,text:'Sélectionner les sièges AF416 Paris → Fortaleza',stage:'Général',priority:'med',done:false,assignee:'tous'},
+  {id:4,text:'Confirmer logement Paraty nuits du 4 et 5 août',stage:'Paraty',priority:'high',done:true,assignee:'g'},
+  {id:14,text:'Réserver le bateau retour Ponta Negra → Paraty (5 août, haute saison — à anticiper)',stage:'Paraty',priority:'high',done:false,assignee:'g'},
+  {id:5,text:'Organiser transfert Paraty → São Paulo GRU (6 août, ~5h)',stage:'São Paulo',priority:'high',done:false,assignee:'g'},
+  {id:6,text:'Réserver hôtel près aéroport GRU nuit du 6 août',stage:'São Paulo',priority:'high',done:false,assignee:'g'},
+  {id:7,text:'Organiser transfert JJD → Tatajuba (7 août après 11h30)',stage:'Jericoacoara',priority:'med',done:false,assignee:'g'},
+  {id:8,text:'Confirmer logement Tatajuba',stage:'Jericoacoara',priority:'high',done:false,assignee:'g'},
+  {id:9,text:'Organiser transfert Jericoacoara → Fortaleza (avant 20 août)',stage:'Retour',priority:'high',done:false,assignee:'g'},
+  {id:10,text:'Assurance voyage — vérifier couverture Brésil',stage:'Général',priority:'med',done:false,assignee:'tous'},
+  {id:11,text:'Vérifier validité des passeports',stage:'Général',priority:'med',done:false,assignee:'tous'},
+  {id:12,text:'SIM / eSIM data Brésil',stage:'Général',priority:'low',done:false,assignee:'tous'},
+  {id:13,text:'Prévoir reais brésiliens ou retrait sur place',stage:'Général',priority:'low',done:false,assignee:'tous'},
 ];
 let tasks = load('tasks', defaultTasks);
 let taskId = load('taskId', defaultTasks.length+1);
+let taskFilter = 'tous';
+
+const ASSIGNEE_LABELS = { g:'G', v:'V', tous:'G+V' };
+const ASSIGNEE_NEXT  = { tous:'g', g:'v', v:'tous' };
+const ASSIGNEE_CLS   = { g:'ta-g', v:'ta-v', tous:'ta-tous' };
+
+function setTaskFilter(f, btn) {
+  taskFilter = f;
+  document.querySelectorAll('.task-filter button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
 
 function renderTasks() {
   const stages = ['Général','Rio','Ilha Grande','Paraty','São Paulo','Jericoacoara','Retour'];
   const pOrd = {high:0,med:1,low:2};
   let html = '';
+  let filtered = taskFilter === 'tous' ? tasks : tasks.filter(t => (t.assignee||'tous') === taskFilter || (t.assignee||'tous') === 'tous');
   stages.forEach(s => {
-    const st = tasks.filter(t => t.stage===s);
+    const st = filtered.filter(t => t.stage===s);
     if (!st.length) return;
     html += `<p class="section-title">${s}</p>`;
     st.sort((a,b)=>pOrd[a.priority]-pOrd[b.priority]).forEach(t => {
+      const a = t.assignee || 'tous';
       html += `<div class="task-item ${t.done?'done':''}" onclick="toggleTask(${t.id})">
         <div class="task-priority p-${t.priority}"></div>
         <div class="task-check">${t.done?'✓':''}</div>
         <div class="task-text">${t.text}</div>
+        <button class="task-assignee ${ASSIGNEE_CLS[a]}" onclick="event.stopPropagation();cycleAssignee(${t.id})" title="Changer l'assigné">${ASSIGNEE_LABELS[a]}</button>
         <button class="btn btn-del btn-sm" onclick="event.stopPropagation();delTask(${t.id})">✕</button>
       </div>`;
     });
@@ -1207,11 +1242,12 @@ function renderTasks() {
 }
 function toggleTask(id){const t=tasks.find(t=>t.id===id);if(t){t.done=!t.done;fbSave('tasks',tasks);renderTasks();}}
 function delTask(id){tasks=tasks.filter(t=>t.id!==id);fbSave('tasks',tasks);renderTasks();}
+function cycleAssignee(id){const t=tasks.find(t=>t.id===id);if(t){t.assignee=ASSIGNEE_NEXT[t.assignee||'tous'];fbSave('tasks',tasks);renderTasks();}}
 function toggleAddTask(){document.getElementById('add-task-form').classList.toggle('visible');}
 function addTask(){
   const txt=document.getElementById('new-task-text').value.trim();
   if(!txt)return;
-  tasks.push({id:taskId++,text:txt,stage:document.getElementById('new-task-stage').value,priority:document.getElementById('new-task-priority').value,done:false});
+  tasks.push({id:taskId++,text:txt,stage:document.getElementById('new-task-stage').value,priority:document.getElementById('new-task-priority').value,done:false,assignee:document.getElementById('new-task-assignee').value});
   fbSave('tasks',tasks);fbSave('taskId',taskId);
   document.getElementById('new-task-text').value='';
   document.getElementById('add-task-form').classList.remove('visible');
