@@ -709,7 +709,7 @@ function submitNote() {
   const txt = document.getElementById('mn-text').value.trim();
   if (!txt) return;
   notes.push({ id: noteId++, author: document.getElementById('mn-author').value, stage: document.getElementById('mn-stage').value, text: txt, date: new Date().toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) });
-  save('notes', notes); save('noteId', noteId);
+  fbSave('notes', notes); fbSave('noteId', noteId);
   document.getElementById('mn-text').value = '';
   renderNotes(); closeModal();
   showTab('notes', document.querySelectorAll('nav button')[4]);
@@ -719,7 +719,7 @@ function submitTask() {
   const txt = document.getElementById('mt-text').value.trim();
   if (!txt) return;
   tasks.push({ id: taskId++, text: txt, stage: document.getElementById('mt-stage').value, priority: document.getElementById('mt-priority').value, done: false });
-  save('tasks', tasks); save('taskId', taskId);
+  fbSave('tasks', tasks); fbSave('taskId', taskId);
   document.getElementById('mt-text').value = '';
   renderTasks(); closeModal();
   showTab('taches', document.querySelectorAll('nav button')[3]);
@@ -730,7 +730,7 @@ function submitEvent() {
   const date = document.getElementById('me-date').value;
   if (!label || !date) return;
   customEvents.push({ date, label, cls: document.getElementById('me-stage').value });
-  save('customEvents', customEvents);
+  fbSave('customEvents', customEvents);
   // add to events map
   document.getElementById('me-label').value = '';
   reloadCustomEvents();
@@ -744,7 +744,7 @@ function submitInfo() {
   if (!title && !txt) return;
   const full = title ? `📌 **${title}**\n${txt}` : txt;
   notes.push({ id: noteId++, author: document.getElementById('mi-author').value, stage: document.getElementById('mi-stage').value, text: full, date: new Date().toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) });
-  save('notes', notes); save('noteId', noteId);
+  fbSave('notes', notes); fbSave('noteId', noteId);
   document.getElementById('mi-title').value = '';
   document.getElementById('mi-text').value = '';
   renderNotes(); closeModal();
@@ -799,21 +799,46 @@ const events = {
 function pad(n){return String(n).padStart(2,'0');}
 // ===== PROGRAMMES JOUR PAR JOUR =====
 const dayPrograms = {
+  '2026-08-07': {
+    title: 'Jour 12 · São Paulo → Jericoacoara',
+    sub: 'Début du séjour kite 🪁',
+    content: `⚠️ Réveil ~5h30 au Comfort Hotel
+
+✈️ VOL :
+LATAM · GRU → Fortaleza → JJD
+Départ 8h05 · Arrivée 11h30
+Réf. FVZDSL
+
+🚙 TRANSFERT :
+JJD → Tatajuba (4x4 ou buggy)
+⚠️ À organiser (piste sablonneuse, véhicule spécial requis)
+
+🏝️ ARRIVÉE TATAJUBA :
+Installation · Première découverte du village
+Dunes · Lagune · Coucher de soleil
+
+🪁 Début du séjour kite !`
+  },
   '2026-08-06': {
     title: 'Jour 11 · Paraty → São Paulo',
-    sub: 'Transfert vers l\'aéroport',
-    content: `🚗 TRANSFERT PRIVÉ :
-Paraty → São Paulo Guarulhos (GRU) · ~5h de route
+    sub: 'Dernier matin à Paraty',
+    content: `🌅 MATIN :
+Temps libre
+Dernier café dans les ruelles pavées ☕
+Dernières boutiques
 
-🏨 ARRIVÉE :
-Comfort Hotel Guarulhos Aeroporto
-Check-in · Repos
+🍽️ DÉJEUNER
 
-✈️ DEMAIN MATIN :
-Vol São Paulo GRU → Jericoacoara
+🚗 APRÈS-MIDI :
+Chauffeur privé → Guarulhos (~5h)
+Check-in Comfort Hotel Guarulhos Aeroporto
+
+🌙 SOIR :
+Repos
+⚠️ Vol demain à 8h05 — coucher tôt !
 
 ✅ À ORGANISER :
-⭐ Réserver transfert privé Paraty → GRU (prévoir départ matin pour arriver en début d'après-midi)`
+⭐ Réserver chauffeur privé Paraty → GRU`
   },
   '2026-08-05': {
     title: 'Jour 10 · Retour à Paraty',
@@ -1126,7 +1151,7 @@ function addTask(){
   const txt=document.getElementById('new-task-text').value.trim();
   if(!txt)return;
   tasks.push({id:taskId++,text:txt,stage:document.getElementById('new-task-stage').value,priority:document.getElementById('new-task-priority').value,done:false});
-  save('tasks',tasks);save('taskId',taskId);
+  fbSave('tasks',tasks);fbSave('taskId',taskId);
   document.getElementById('new-task-text').value='';
   document.getElementById('add-task-form').classList.remove('visible');
   renderTasks();
@@ -1191,7 +1216,7 @@ function addNote(){
   const txt=document.getElementById('note-text').value.trim();
   if(!txt)return;
   notes.push({id:noteId++,author:document.getElementById('note-author').value,stage:document.getElementById('note-stage').value,text:txt,date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
-  save('notes',notes);save('noteId',noteId);
+  fbSave('notes',notes);fbSave('noteId',noteId);
   document.getElementById('note-text').value='';
   renderNotes();
 }
@@ -1226,6 +1251,78 @@ function handleFiles(files){
 function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('dragging');handleFiles(e.dataTransfer.files);}
 function delDoc(id){docs=docs.filter(d=>d.id!==id);save('docs',docs);renderDocs();}
 renderDocs();
+</script>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDUvakBSsXdGp1n87ZLpqIz0f8B_UmU1A4",
+  authDomain: "voyage-bresil-2026.firebaseapp.com",
+  databaseURL: "https://voyage-bresil-2026-default-rtdb.firebaseio.com",
+  projectId: "voyage-bresil-2026",
+  storageBucket: "voyage-bresil-2026.firebasestorage.app",
+  messagingSenderId: "194543837527",
+  appId: "1:194543837527:web:cb7ef32a29496a9f3e5e12"
+};
+firebase.initializeApp(firebaseConfig);
+const fbdb = firebase.database();
+const REF = 'voyage';
+
+function fbSave(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+  fbdb.ref(REF + '/' + key).set(value);
+}
+
+// Real-time listeners
+fbdb.ref(REF + '/notes').on('value', snap => {
+  const val = snap.val();
+  if (val === null) { fbdb.ref(REF+'/notes').set(notes); return; }
+  const arr = Array.isArray(val) ? val : Object.values(val);
+  if (JSON.stringify(arr) !== JSON.stringify(notes)) {
+    notes = arr;
+    localStorage.setItem('notes', JSON.stringify(notes));
+    if(typeof renderNotes === 'function') renderNotes();
+  }
+});
+fbdb.ref(REF + '/noteId').on('value', snap => { if(snap.val()!==null) noteId = snap.val(); });
+
+fbdb.ref(REF + '/tasks').on('value', snap => {
+  const val = snap.val();
+  if (val === null) { fbdb.ref(REF+'/tasks').set(tasks); return; }
+  const arr = Array.isArray(val) ? val : Object.values(val);
+  if (JSON.stringify(arr) !== JSON.stringify(tasks)) {
+    tasks = arr;
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    if(typeof renderTasks === 'function') renderTasks();
+  }
+});
+fbdb.ref(REF + '/taskId').on('value', snap => { if(snap.val()!==null) taskId = snap.val(); });
+
+fbdb.ref(REF + '/customEvents').on('value', snap => {
+  const val = snap.val();
+  if (val === null) return;
+  const arr = Array.isArray(val) ? val : Object.values(val);
+  if (JSON.stringify(arr) !== JSON.stringify(customEvents)) {
+    customEvents = arr;
+    localStorage.setItem('customEvents', JSON.stringify(customEvents));
+    if(typeof reloadCustomEvents === 'function') { reloadCustomEvents(); renderCalendar(); }
+  }
+});
+
+// Indicateur de sync
+const syncDot = document.createElement('div');
+syncDot.id = 'sync-indicator';
+syncDot.style.cssText = 'position:fixed;bottom:90px;right:1.2rem;background:#009c3b;color:white;border-radius:999px;padding:.3rem .7rem;font-size:.72rem;font-weight:600;z-index:500;opacity:0;transition:opacity .5s';
+syncDot.textContent = '🔄 Synchronisé';
+document.body.appendChild(syncDot);
+fbdb.ref('.info/connected').on('value', snap => {
+  syncDot.textContent = snap.val() ? '🟢 En ligne' : '🔴 Hors ligne';
+  syncDot.style.background = snap.val() ? '#009c3b' : '#dc2626';
+  syncDot.style.opacity = '1';
+  setTimeout(() => { if(snap.val()) syncDot.style.opacity = '0'; }, 3000);
+});
 </script>
 
 <!-- LEAFLET MAP -->
