@@ -242,6 +242,7 @@
   <button onclick="showTab('taches',this)">✅ À faire</button>
   <button onclick="showTab('notes',this)">📝 Notes</button>
   <button onclick="showTab('docs',this)">📎 Documents</button>
+  <button onclick="showTab('bagages',this)">🧳 Bagages</button>
   <button onclick="showTab('carte',this);initMap()">🗺️ Carte</button>
 </nav>
 
@@ -587,6 +588,22 @@
   </div>
 </div>
 
+<!-- ===== BAGAGES ===== -->
+<div id="tab-bagages" class="tab-content">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+    <h2 style="font-size:1.1rem;font-weight:700;color:var(--blue)">🧳 Pense-bête bagages</h2>
+    <span id="bag-progress" style="font-size:.78rem;font-weight:700;color:var(--muted)"></span>
+  </div>
+  <div id="bag-list"></div>
+  <div style="margin-top:1.2rem">
+    <p class="section-title">Ajouter un article</p>
+    <div style="display:flex;gap:.4rem">
+      <input id="bag-new-text" placeholder="Ex : Jumelles, jeu de cartes…" style="flex:1;padding:.55rem .75rem;border:1px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;color:var(--text)">
+      <button class="btn btn-primary btn-sm" onclick="addBagItem()" style="padding:.55rem 1rem;white-space:nowrap">+ Ajouter</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== CARTE ===== -->
 <div id="tab-carte" class="tab-content">
   <div style="margin-bottom:.8rem">
@@ -852,6 +869,126 @@ function renderResa() {
   document.getElementById('resa-list').innerHTML = html;
 }
 renderResa();
+
+// ===== BAGAGES =====
+const BAG_GROUPS = ['📄 Documents & argent','💊 Santé & protection','👗 Vêtements','🏖️ Plage & activités','💻 Tech & électronique','🧴 Toilette'];
+const BAG_ITEMS_BASE = [
+  // Documents
+  {key:'passeport-g',    text:'Passeport Guillaume (valide > 6 mois)', group:'📄 Documents & argent',    assignee:'g'},
+  {key:'passeport-v',    text:'Passeport Valérie (valide > 6 mois)',   group:'📄 Documents & argent',    assignee:'v'},
+  {key:'assurance',      text:'Assurance voyage (attestation imprimée)',group:'📄 Documents & argent',    assignee:'g'},
+  {key:'billets',        text:'Billets avion (PDF imprimé + app)',      group:'📄 Documents & argent',    assignee:'g'},
+  {key:'hotels',         text:'Confirmations hôtels imprimées',         group:'📄 Documents & argent',    assignee:'g'},
+  {key:'cartes-banque',  text:'Cartes bancaires (2 min.)',              group:'📄 Documents & argent',    assignee:'tous'},
+  {key:'reais',          text:'Reais cash (300–500 BRL)',               group:'📄 Documents & argent',    assignee:'g'},
+  {key:'permis',         text:'Permis de conduire international',       group:'📄 Documents & argent',    assignee:'g'},
+  // Santé
+  {key:'deet',           text:'Répulsif anti-moustiques DEET 50%+',    group:'💊 Santé & protection',    assignee:'tous'},
+  {key:'creme-solaire',  text:'Crème solaire SPF 50+ (grande taille)', group:'💊 Santé & protection',    assignee:'tous'},
+  {key:'immodium',       text:'Imodium / Smecta',                      group:'💊 Santé & protection',    assignee:'g'},
+  {key:'doliprane',      text:'Doliprane / Ibuprofène',                group:'💊 Santé & protection',    assignee:'g'},
+  {key:'antihistaminique',text:'Antihistaminique (piqûres/allergie)',   group:'💊 Santé & protection',    assignee:'g'},
+  {key:'trousse',        text:'Petite trousse premiers soins',          group:'💊 Santé & protection',    assignee:'g'},
+  {key:'ordonnances',    text:'Ordonnances + médicaments habituels',   group:'💊 Santé & protection',    assignee:'tous'},
+  // Vêtements
+  {key:'maillot-g',      text:'Maillots de bain x3',                   group:'👗 Vêtements',             assignee:'g'},
+  {key:'maillot-v',      text:'Maillots de bain x3',                   group:'👗 Vêtements',             assignee:'v'},
+  {key:'tshirts-g',      text:'T-shirts légers x6',                    group:'👗 Vêtements',             assignee:'g'},
+  {key:'tshirts-v',      text:'T-shirts / tops x6',                    group:'👗 Vêtements',             assignee:'v'},
+  {key:'shorts-g',       text:'Shorts x3',                             group:'👗 Vêtements',             assignee:'g'},
+  {key:'robes-v',        text:'Robes légères / jupes x3',              group:'👗 Vêtements',             assignee:'v'},
+  {key:'soiree',         text:'Tenue soirée (resto élégant)',           group:'👗 Vêtements',             assignee:'tous'},
+  {key:'sandales',       text:'Sandales / claquettes',                  group:'👗 Vêtements',             assignee:'tous'},
+  {key:'chaussures',     text:'Chaussures de marche fermées',          group:'👗 Vêtements',             assignee:'tous'},
+  {key:'kway',           text:'Coupe-vent léger / imperméable',        group:'👗 Vêtements',             assignee:'tous'},
+  {key:'chapeau',        text:'Chapeau / casquette',                   group:'👗 Vêtements',             assignee:'tous'},
+  // Plage
+  {key:'lunettes-g',     text:'Lunettes de soleil',                    group:'🏖️ Plage & activités',    assignee:'g'},
+  {key:'lunettes-v',     text:'Lunettes de soleil',                    group:'🏖️ Plage & activités',    assignee:'v'},
+  {key:'serviette-plage',text:'Serviettes de plage x2',                group:'🏖️ Plage & activités',    assignee:'tous'},
+  {key:'sac-etanche',    text:'Sac étanche pour valeurs à la plage',   group:'🏖️ Plage & activités',    assignee:'g'},
+  {key:'tong-eau',       text:'Tongs aquatiques (rando eau / canyons)',group:'🏖️ Plage & activités',    assignee:'tous'},
+  {key:'snorkeling',     text:'Masque snorkeling',                     group:'🏖️ Plage & activités',    assignee:'tous'},
+  // Tech
+  {key:'telephone-g',    text:'Téléphone + chargeur',                  group:'💻 Tech & électronique',   assignee:'g'},
+  {key:'telephone-v',    text:'Téléphone + chargeur',                  group:'💻 Tech & électronique',   assignee:'v'},
+  {key:'adaptateur',     text:'Adaptateur prise Type N (Brésil)',      group:'💻 Tech & électronique',   assignee:'g'},
+  {key:'batterie',       text:'Batterie externe (20 000 mAh)',         group:'💻 Tech & électronique',   assignee:'g'},
+  {key:'appareil-photo', text:'Appareil photo + carte SD + chargeur',  group:'💻 Tech & électronique',   assignee:'g'},
+  {key:'sim',            text:'eSIM ou carte SIM Brésil préactivée',   group:'💻 Tech & électronique',   assignee:'g'},
+  {key:'ecouteurs',      text:'Écouteurs / airpods',                   group:'💻 Tech & électronique',   assignee:'tous'},
+  // Toilette
+  {key:'shampoing',      text:'Shampoing + après-shampoing',           group:'🧴 Toilette',              assignee:'tous'},
+  {key:'gel-douche',     text:'Gel douche',                            group:'🧴 Toilette',              assignee:'tous'},
+  {key:'deodorant',      text:'Déodorant',                             group:'🧴 Toilette',              assignee:'tous'},
+  {key:'rasoir-g',       text:'Rasoir',                                group:'🧴 Toilette',              assignee:'g'},
+  {key:'epilation-v',    text:'Kit épilation',                         group:'🧴 Toilette',              assignee:'v'},
+  {key:'makeup-v',       text:'Maquillage léger',                      group:'🧴 Toilette',              assignee:'v'},
+  {key:'lingettes',      text:'Lingettes désinfectantes',              group:'🧴 Toilette',              assignee:'tous'},
+];
+let bagCustom    = load('bagCustom',    []);
+let bagDone      = load('bagDone',      {});
+let bagAssignee  = load('bagAssignee',  {});
+function allBagItems(){ return [...BAG_ITEMS_BASE, ...bagCustom]; }
+
+function toggleBag(key){
+  bagDone[key] = !bagDone[key];
+  save('bagDone', bagDone);
+  if(typeof fbSave==='function') fbSave('bagDone', bagDone);
+  renderBag();
+}
+function cycleBagAssignee(key){
+  const cur = bagAssignee[key] || allBagItems().find(i=>i.key===key)?.assignee || 'tous';
+  bagAssignee[key] = ASSIGNEE_NEXT[cur];
+  save('bagAssignee', bagAssignee);
+  if(typeof fbSave==='function') fbSave('bagAssignee', bagAssignee);
+  renderBag();
+}
+function addBagItem(){
+  const inp = document.getElementById('bag-new-text');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  const key = 'custom-' + Date.now();
+  bagCustom.push({key, text:txt, group:'➕ Articles perso', assignee:'tous'});
+  save('bagCustom', bagCustom);
+  if(typeof fbSave==='function') fbSave('bagCustom', bagCustom);
+  inp.value = '';
+  renderBag();
+}
+function delBagItem(key){
+  bagCustom = bagCustom.filter(i=>i.key!==key);
+  delete bagDone[key]; delete bagAssignee[key];
+  save('bagCustom', bagCustom); save('bagDone', bagDone); save('bagAssignee', bagAssignee);
+  if(typeof fbSave==='function'){ fbSave('bagCustom',bagCustom); fbSave('bagDone',bagDone); fbSave('bagAssignee',bagAssignee); }
+  renderBag();
+}
+function renderBag(){
+  const all = allBagItems();
+  const groups = [...BAG_GROUPS, ...(bagCustom.length ? ['➕ Articles perso'] : [])];
+  let html = ''; let total=all.length, done=0;
+  groups.forEach(g => {
+    const items = all.filter(i=>i.group===g);
+    if(!items.length) return;
+    html += `<p class="section-title">${g}</p>`;
+    items.forEach(item => {
+      const isDone = !!bagDone[item.key];
+      if(isDone) done++;
+      const a = bagAssignee[item.key] || item.assignee || 'tous';
+      const isCustom = item.key.startsWith('custom-');
+      html += `<div class="task-item ${isDone?'done':''}" onclick="toggleBag('${item.key}')">
+        <div class="task-check">${isDone?'✓':''}</div>
+        <div class="task-text">${item.text}</div>
+        <button class="task-assignee ${ASSIGNEE_CLS[a]}" onclick="event.stopPropagation();cycleBagAssignee('${item.key}')" title="Changer l'assigné">${ASSIGNEE_LABELS[a]}</button>
+        ${isCustom?`<button class="btn btn-sm btn-del" onclick="event.stopPropagation();delBagItem('${item.key}')" style="margin-left:.2rem;padding:.15rem .45rem">✕</button>`:''}
+      </div>`;
+    });
+  });
+  document.getElementById('bag-list').innerHTML = html;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('bag-progress').textContent = `${done}/${total} · ${pct}%`;
+}
+renderBag();
+document.getElementById('bag-new-text').addEventListener('keydown', e=>{ if(e.key==='Enter') addBagItem(); });
 
 // ===== CALENDAR =====
 const events = {
@@ -1419,6 +1556,28 @@ fbdb.ref(REF + '/resaAssignee').on('value', snap => {
   renderResa();
 });
 
+fbdb.ref(REF + '/bagDone').on('value', snap => {
+  const val = snap.val();
+  if (val === null) { fbdb.ref(REF+'/bagDone').set(bagDone); return; }
+  bagDone = val;
+  localStorage.setItem('bres_bagDone', JSON.stringify(bagDone));
+  renderBag();
+});
+fbdb.ref(REF + '/bagAssignee').on('value', snap => {
+  const val = snap.val();
+  if (val === null) { fbdb.ref(REF+'/bagAssignee').set(bagAssignee); return; }
+  bagAssignee = val;
+  localStorage.setItem('bres_bagAssignee', JSON.stringify(bagAssignee));
+  renderBag();
+});
+fbdb.ref(REF + '/bagCustom').on('value', snap => {
+  const val = snap.val();
+  if (val === null) return;
+  bagCustom = Array.isArray(val) ? val : Object.values(val);
+  localStorage.setItem('bres_bagCustom', JSON.stringify(bagCustom));
+  renderBag();
+});
+
 // Indicateur de sync
 const syncDot = document.createElement('div');
 syncDot.id = 'sync-indicator';
@@ -1479,9 +1638,9 @@ async function prefetchRioTiles(btn) {
 
 let mapInstance = null;
 function initMap(){
-  if(mapInstance) { setTimeout(()=>mapInstance.invalidateSize(),100); return; }
+  if(mapInstance) { setTimeout(()=>{ mapInstance.invalidateSize(); mapInstance.setView([-22.97,-43.28],12); },150); return; }
   setTimeout(()=>{
-    mapInstance = L.map('map').setView([5, -30], 3);
+    mapInstance = L.map('map').setView([-22.97, -43.28], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
       attribution:'© OpenStreetMap contributors', maxZoom:18
     }).addTo(mapInstance);
@@ -1576,6 +1735,17 @@ function initMap(){
           L.DomEvent.on(b,'click',e=>{L.DomEvent.stopPropagation(e);on=!on;action(on);b.style.background=on?color:'white';b.style.color=on?'white':color;});
           return b;
         };
+        // Vues rapides
+        const mkSimpleBtn = (label, color, action) => {
+          const b = L.DomUtil.create('button','',wrap);
+          b.innerHTML=label;
+          b.style.cssText=`background:${color};border:none;border-radius:8px;padding:.35rem .75rem;font-size:.78rem;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.15);color:white;display:block;width:100%`;
+          L.DomEvent.on(b,'click',e=>{L.DomEvent.stopPropagation(e);action();});
+          return b;
+        };
+        mkSimpleBtn('🏖️ Rio', '#009c3b', ()=>mapInstance.setView([-22.97,-43.28],12));
+        mkSimpleBtn('🌍 Vue voyage','#002776', ()=>mapInstance.setView([5,-30],3));
+        // Lignes métro
         mkBtn('🚇 L1 Orange','#e87722', on=>on?grpL1.addTo(mapInstance):grpL1.remove());
         mkBtn('🚇 L2 Verte','#3aaa35',  on=>on?grpL2.addTo(mapInstance):grpL2.remove());
         mkBtn('🚇 L4 Jaune','#c8a800',  on=>on?grpL4.addTo(mapInstance):grpL4.remove());
