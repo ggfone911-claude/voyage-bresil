@@ -1722,54 +1722,77 @@ function initMap(){
     const metroGroup = L.layerGroup([grpL1, grpL2, grpL4]);
 
     // Bouton toggle métro
-    const MetroControl = L.Control.extend({
+    // Contrôle compact — un seul bouton ☰ qui déploie un panneau
+    const MapControl = L.Control.extend({
       options:{position:'topright'},
       onAdd(){
         const wrap = L.DomUtil.create('div');
-        wrap.style.cssText='display:flex;flex-direction:column;gap:.35rem';
-        const mkBtn = (label, color, action) => {
-          const b = L.DomUtil.create('button','',wrap);
-          b.innerHTML=label;
-          b.style.cssText=`background:white;border:2px solid ${color};border-radius:8px;padding:.35rem .75rem;font-size:.78rem;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.15);color:${color};display:block;width:100%`;
-          let on=false;
-          L.DomEvent.on(b,'click',e=>{L.DomEvent.stopPropagation(e);on=!on;action(on);b.style.background=on?color:'white';b.style.color=on?'white':color;});
-          return b;
+        wrap.style.cssText='position:relative';
+
+        // Bouton hamburger
+        const tog = L.DomUtil.create('button','',wrap);
+        tog.innerHTML='🗂️';
+        tog.title='Couches & vues';
+        tog.style.cssText='background:white;border:none;border-radius:8px;width:34px;height:34px;font-size:1rem;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;';
+
+        // Panneau dépliable
+        const panel = L.DomUtil.create('div','',wrap);
+        panel.style.cssText='display:none;position:absolute;right:0;top:38px;background:white;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.18);padding:.5rem;min-width:150px;';
+
+        const sep = (txt) => {
+          const s = L.DomUtil.create('div','',panel);
+          s.style.cssText='font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#9ca3af;padding:.25rem .3rem .1rem;';
+          s.textContent=txt;
         };
-        // Vues rapides
-        const mkSimpleBtn = (label, color, action) => {
-          const b = L.DomUtil.create('button','',wrap);
+        const mkRow = (label, colorDot, action) => {
+          const row = L.DomUtil.create('label','',panel);
+          row.style.cssText='display:flex;align-items:center;gap:.45rem;padding:.28rem .3rem;font-size:.76rem;font-weight:600;cursor:pointer;border-radius:6px;';
+          row.onmouseenter=()=>row.style.background='#f3f4f6';
+          row.onmouseleave=()=>row.style.background='';
+          const cb = L.DomUtil.create('input','',row);
+          cb.type='checkbox';cb.style.cssText='accent-color:'+colorDot+';cursor:pointer;width:13px;height:13px;';
+          const dot = L.DomUtil.create('span','',row);
+          dot.style.cssText='width:8px;height:8px;border-radius:50%;background:'+colorDot+';flex-shrink:0;';
+          const lbl = L.DomUtil.create('span','',row);
+          lbl.textContent=label;
+          L.DomEvent.on(cb,'change',e=>{L.DomEvent.stopPropagation(e);action(cb.checked);});
+          return row;
+        };
+        const mkBtn = (label, bg, action) => {
+          const b = L.DomUtil.create('button','',panel);
           b.innerHTML=label;
-          b.style.cssText=`background:${color};border:none;border-radius:8px;padding:.35rem .75rem;font-size:.78rem;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.15);color:white;display:block;width:100%`;
+          b.style.cssText='display:block;width:100%;text-align:left;background:'+bg+';color:white;border:none;border-radius:6px;padding:.28rem .5rem;font-size:.75rem;font-weight:600;cursor:pointer;margin-top:.2rem;';
           L.DomEvent.on(b,'click',e=>{L.DomEvent.stopPropagation(e);action();});
-          return b;
         };
-        mkSimpleBtn('🏖️ Rio', '#009c3b', ()=>mapInstance.setView([-22.97,-43.28],12));
-        mkSimpleBtn('🌍 Vue voyage','#002776', ()=>mapInstance.setView([5,-30],3));
-        // Lignes métro
-        mkBtn('🚇 L1 Orange','#e87722', on=>on?grpL1.addTo(mapInstance):grpL1.remove());
-        mkBtn('🚇 L2 Verte','#3aaa35',  on=>on?grpL2.addTo(mapInstance):grpL2.remove());
-        mkBtn('🚇 L4 Jaune','#c8a800',  on=>on?grpL4.addTo(mapInstance):grpL4.remove());
-        mkBtn('📥 Hors ligne Rio', '#6366f1', on=>{if(on)prefetchRioTiles(wrap.querySelector('button:last-child'));});
+
+        sep('Vues');
+        mkBtn('🏖️ Rio (zoom 12)','#009c3b',()=>mapInstance.setView([-22.97,-43.28],12));
+        mkBtn('🌍 Voyage complet','#002776',()=>mapInstance.setView([5,-30],3));
+        sep('Métro Rio');
+        mkRow('L1 Orange','#e87722',on=>on?grpL1.addTo(mapInstance):grpL1.remove());
+        mkRow('L2 Verte','#3aaa35', on=>on?grpL2.addTo(mapInstance):grpL2.remove());
+        mkRow('L4 Jaune','#c8a800', on=>on?grpL4.addTo(mapInstance):grpL4.remove());
+        sep('Hors ligne');
+        const offBtn = L.DomUtil.create('button','',panel);
+        offBtn.innerHTML='📥 Pré-charger Rio';
+        offBtn.style.cssText='display:block;width:100%;text-align:left;background:#6366f1;color:white;border:none;border-radius:6px;padding:.28rem .5rem;font-size:.75rem;font-weight:600;cursor:pointer;margin-top:.2rem;';
+        L.DomEvent.on(offBtn,'click',e=>{L.DomEvent.stopPropagation(e);prefetchRioTiles(offBtn);});
+
+        // Toggle open/close
+        let open=false;
+        L.DomEvent.on(tog,'click',e=>{
+          L.DomEvent.stopPropagation(e);
+          open=!open;
+          panel.style.display=open?'block':'none';
+          tog.style.background=open?'#f0f4ff':'white';
+        });
+        // Fermer si clic ailleurs
+        L.DomEvent.on(document,'click',()=>{open=false;panel.style.display='none';tog.style.background='white';});
+
         return wrap;
       }
     });
-    new MetroControl().addTo(mapInstance);
-
-    // Légende
-    const Legend = L.Control.extend({
-      options:{position:'bottomleft'},
-      onAdd(){
-        const d = L.DomUtil.create('div');
-        d.style.cssText='background:white;padding:.5rem .8rem;border-radius:8px;font-size:.7rem;box-shadow:0 2px 6px rgba(0,0,0,.15);line-height:1.8;max-width:200px';
-        d.innerHTML='<b style="font-size:.73rem">MetrôRio</b><br>'
-          +'<span style="color:#e87722">━</span> L1 Orange — Ipanema → Saens Peña<br>'
-          +'<span style="color:#3aaa35">━</span> L2 Verte — Botafogo → Gávea<br>'
-          +'<span style="color:#c8a800">━</span> L4 Jaune — Ipanema → Barra<br>'
-          +'<span style="color:#888;font-size:.65rem">Clic station = infos · tunnel L4 sous la montagne</span>';
-        return d;
-      }
-    });
-    new Legend().addTo(mapInstance);
+    new MapControl().addTo(mapInstance);
 
     mapInstance.invalidateSize();
   }, 200);
