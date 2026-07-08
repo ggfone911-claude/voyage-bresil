@@ -797,26 +797,33 @@ function load(k,d){try{const v=localStorage.getItem('bres_'+k);return v?JSON.par
 
 // ===== RÉSERVATIONS =====
 const RESA_ITEMS = [
-  {key:'transfert-gig', text:'Transfert privé GIG → Hôtel Rio',           priority:'high', group:'🌟 Priorité 1'},
-  {key:'christ',        text:'Christ Rédempteur',                          priority:'high', group:'🌟 Priorité 1'},
-  {key:'pain-sucre',    text:'Pain de Sucre',                              priority:'high', group:'🌟 Priorité 1'},
-  {key:'guide-santa',   text:'Guide privé Santa Teresa',                   priority:'high', group:'🌟 Priorité 1'},
-  {key:'augusto',       text:'Guide Augusto (Dois Irmãos)',                priority:'high', group:'🌟 Priorité 1'},
-  {key:'lodge-rio',     text:'🌴 Atlantica Lodge · Rio → Lodge',           priority:'med',  group:'🌟 Priorité 2'},
-  {key:'lodge-paraty',  text:'🌴 Atlantica Lodge · Lodge → Paraty',        priority:'med',  group:'🌟 Priorité 2'},
-  {key:'lodge-bateau',  text:'🌴 Atlantica Lodge · Excursion bateau',      priority:'med',  group:'🌟 Priorité 2'},
-  {key:'ouro-consigne', text:'🏨 Pousada do Ouro · Consigne bagages',      priority:'med',  group:'🌟 Priorité 2'},
-  {key:'ouro-laran',    text:'🏨 Pousada do Ouro · Transfert Laranjeiras', priority:'med',  group:'🌟 Priorité 2'},
-  {key:'ouro-pique',    text:'🏨 Pousada do Ouro · Pique-nique',           priority:'low',  group:'🌟 Priorité 2'},
-  {key:'caiçara-bateau',text:'⛵ Cultura Caiçara · Ponta Negra → Paraty',  priority:'med',  group:'🌟 Priorité 2'},
-  {key:'chauffeur-gru', text:'🚗 Chauffeur privé Paraty → Guarulhos',      priority:'high', group:'🌟 Priorité 2'},
+  {key:'transfert-gig', text:'Transfert privé GIG → Hôtel Rio',           priority:'high', group:'🌟 Priorité 1', assignee:'g'},
+  {key:'christ',        text:'Christ Rédempteur',                          priority:'high', group:'🌟 Priorité 1', assignee:'g'},
+  {key:'pain-sucre',    text:'Pain de Sucre',                              priority:'high', group:'🌟 Priorité 1', assignee:'g'},
+  {key:'guide-santa',   text:'Guide privé Santa Teresa',                   priority:'high', group:'🌟 Priorité 1', assignee:'g'},
+  {key:'augusto',       text:'Guide Augusto (Dois Irmãos)',                priority:'high', group:'🌟 Priorité 1', assignee:'g'},
+  {key:'lodge-rio',     text:'🌴 Atlantica Lodge · Rio → Lodge',           priority:'med',  group:'🌟 Priorité 2', assignee:'g'},
+  {key:'lodge-paraty',  text:'🌴 Atlantica Lodge · Lodge → Paraty',        priority:'med',  group:'🌟 Priorité 2', assignee:'g'},
+  {key:'lodge-bateau',  text:'🌴 Atlantica Lodge · Excursion bateau',      priority:'med',  group:'🌟 Priorité 2', assignee:'g'},
+  {key:'ouro-consigne', text:'🏨 Pousada do Ouro · Consigne bagages',      priority:'med',  group:'🌟 Priorité 2', assignee:'g'},
+  {key:'ouro-laran',    text:'🏨 Pousada do Ouro · Transfert Laranjeiras', priority:'med',  group:'🌟 Priorité 2', assignee:'g'},
+  {key:'ouro-pique',    text:'🏨 Pousada do Ouro · Pique-nique',           priority:'low',  group:'🌟 Priorité 2', assignee:'tous'},
+  {key:'caiçara-bateau',text:'⛵ Cultura Caiçara · Ponta Negra → Paraty',  priority:'med',  group:'🌟 Priorité 2', assignee:'g'},
+  {key:'chauffeur-gru', text:'🚗 Chauffeur privé Paraty → Guarulhos',      priority:'high', group:'🌟 Priorité 2', assignee:'g'},
 ];
-let resaDone = load('resaDone', Object.fromEntries(RESA_ITEMS.map(i => [i.key, true])));
+let resaDone     = load('resaDone',     Object.fromEntries(RESA_ITEMS.map(i => [i.key, true])));
+let resaAssignee = load('resaAssignee', Object.fromEntries(RESA_ITEMS.map(i => [i.key, i.assignee])));
 
 function toggleResa(key) {
   resaDone[key] = !resaDone[key];
   save('resaDone', resaDone);
   if(typeof fbSave === 'function') fbSave('resaDone', resaDone);
+  renderResa();
+}
+function cycleResaAssignee(key) {
+  resaAssignee[key] = ASSIGNEE_NEXT[resaAssignee[key]||'tous'];
+  save('resaAssignee', resaAssignee);
+  if(typeof fbSave === 'function') fbSave('resaAssignee', resaAssignee);
   renderResa();
 }
 
@@ -828,10 +835,12 @@ function renderResa() {
     html += `<p class="section-title">${g}</p>`;
     items.forEach(item => {
       const done = !!resaDone[item.key];
+      const a = resaAssignee[item.key] || item.assignee || 'tous';
       html += `<div class="task-item ${done?'done':''}" onclick="toggleResa('${item.key}')">
         <div class="task-priority p-${item.priority}"></div>
         <div class="task-check">${done?'✓':''}</div>
         <div class="task-text">${item.text}</div>
+        <button class="task-assignee ${ASSIGNEE_CLS[a]}" onclick="event.stopPropagation();cycleResaAssignee('${item.key}')" title="Changer l'assigné">${ASSIGNEE_LABELS[a]}</button>
       </div>`;
     });
   });
@@ -1399,6 +1408,13 @@ fbdb.ref(REF + '/resaDone').on('value', snap => {
   if (val === null) { fbdb.ref(REF+'/resaDone').set(resaDone); return; }
   resaDone = val;
   localStorage.setItem('bres_resaDone', JSON.stringify(resaDone));
+  renderResa();
+});
+fbdb.ref(REF + '/resaAssignee').on('value', snap => {
+  const val = snap.val();
+  if (val === null) { fbdb.ref(REF+'/resaAssignee').set(resaAssignee); return; }
+  resaAssignee = val;
+  localStorage.setItem('bres_resaAssignee', JSON.stringify(resaAssignee));
   renderResa();
 });
 
