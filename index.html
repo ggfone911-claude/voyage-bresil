@@ -795,6 +795,11 @@ function showTab(name, btn) {
 function save(k,v){try{localStorage.setItem('bres_'+k,JSON.stringify(v))}catch(e){}}
 function load(k,d){try{const v=localStorage.getItem('bres_'+k);return v?JSON.parse(v):d}catch(e){return d}}
 
+// ===== ASSIGNEE CONSTANTS (utilisés par tâches ET réservations) =====
+const ASSIGNEE_LABELS = { g:'G', v:'V', tous:'G+V' };
+const ASSIGNEE_NEXT   = { tous:'g', g:'v', v:'tous' };
+const ASSIGNEE_CLS    = { g:'ta-g', v:'ta-v', tous:'ta-tous' };
+
 // ===== RÉSERVATIONS =====
 const RESA_ITEMS = [
   {key:'transfert-gig', text:'Transfert privé GIG → Hôtel Rio',           priority:'high', group:'🌟 Priorité 1', assignee:'g'},
@@ -1210,10 +1215,6 @@ const defaultTasks = [
 let tasks = load('tasks', defaultTasks);
 let taskId = load('taskId', defaultTasks.length+1);
 let taskFilter = 'tous';
-
-const ASSIGNEE_LABELS = { g:'G', v:'V', tous:'G+V' };
-const ASSIGNEE_NEXT  = { tous:'g', g:'v', v:'tous' };
-const ASSIGNEE_CLS   = { g:'ta-g', v:'ta-v', tous:'ta-tous' };
 
 function setTaskFilter(f, btn) {
   taskFilter = f;
