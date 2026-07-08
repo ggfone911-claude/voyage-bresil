@@ -526,42 +526,10 @@
   </div>
   <div id="tasks-list"></div>
 
-  <!-- RÉSERVATIONS CHECKLIST -->
+  <!-- RÉSERVATIONS -->
   <div style="margin-top:1.2rem">
     <p class="section-title">📋 Réservations avant le départ</p>
-    <div class="card">
-      <div class="card-body" style="padding:.8rem 1.2rem">
-
-        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#f59e0b;margin-bottom:.5rem">🌟 Priorité 1</div>
-        <div style="display:flex;flex-direction:column;gap:.1rem;margin-bottom:1rem">
-          <label class="resa-item"><input type="checkbox" id="resa-transfert-gig" onchange="toggleResa('transfert-gig',this.checked)"> Transfert privé GIG → Hôtel Rio</label>
-          <label class="resa-item"><input type="checkbox" id="resa-christ" onchange="toggleResa('christ',this.checked)"> Christ Rédempteur</label>
-          <label class="resa-item"><input type="checkbox" id="resa-pain-sucre" onchange="toggleResa('pain-sucre',this.checked)"> Pain de Sucre</label>
-          <label class="resa-item"><input type="checkbox" id="resa-guide-santa" onchange="toggleResa('guide-santa',this.checked)"> Guide privé Santa Teresa</label>
-          <label class="resa-item"><input type="checkbox" id="resa-augusto" onchange="toggleResa('augusto',this.checked)"> Guide Augusto (Dois Irmãos)</label>
-        </div>
-
-        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6366f1;margin-bottom:.5rem">🌟 Priorité 2</div>
-        <div style="display:flex;flex-direction:column;gap:.1rem">
-          <div style="font-size:.78rem;font-weight:600;color:#374151;margin:.4rem 0 .1rem">🌴 Atlantica Jungle Lodge</div>
-          <label class="resa-item resa-sub"><input type="checkbox" id="resa-lodge-rio" onchange="toggleResa('lodge-rio',this.checked)"> Rio → Lodge</label>
-          <label class="resa-item resa-sub"><input type="checkbox" id="resa-lodge-paraty" onchange="toggleResa('lodge-paraty',this.checked)"> Lodge → Paraty</label>
-          <label class="resa-item resa-sub"><input type="checkbox" id="resa-lodge-bateau" onchange="toggleResa('lodge-bateau',this.checked)"> Excursion bateau</label>
-
-          <div style="font-size:.78rem;font-weight:600;color:#374151;margin:.4rem 0 .1rem">🏨 Pousada do Ouro</div>
-          <label class="resa-item resa-sub"><input type="checkbox" id="resa-ouro-consigne" onchange="toggleResa('ouro-consigne',this.checked)"> Consigne bagages</label>
-          <label class="resa-item resa-sub"><input type="checkbox" id="resa-ouro-laran" onchange="toggleResa('ouro-laran',this.checked)"> Transfert vers Laranjeiras</label>
-          <label class="resa-item resa-sub"><input type="checkbox" id="resa-ouro-pique" onchange="toggleResa('ouro-pique',this.checked)"> Pique-nique (si possible)</label>
-
-          <div style="font-size:.78rem;font-weight:600;color:#374151;margin:.4rem 0 .1rem">⛵ Cultura Caiçara</div>
-          <label class="resa-item resa-sub"><input type="checkbox" id="resa-caiçara-bateau" onchange="toggleResa('caiçara-bateau',this.checked)"> Bateau retour Ponta Negra → Paraty</label>
-
-          <div style="font-size:.78rem;font-weight:600;color:#374151;margin:.4rem 0 .1rem">🚗 Transfert</div>
-          <label class="resa-item"><input type="checkbox" id="resa-chauffeur-gru" onchange="toggleResa('chauffeur-gru',this.checked)"> Chauffeur privé Paraty → Guarulhos</label>
-        </div>
-
-      </div>
-    </div>
+    <div id="resa-list"></div>
   </div>
 </div>
 
@@ -828,21 +796,48 @@ function save(k,v){try{localStorage.setItem('bres_'+k,JSON.stringify(v))}catch(e
 function load(k,d){try{const v=localStorage.getItem('bres_'+k);return v?JSON.parse(v):d}catch(e){return d}}
 
 // ===== RÉSERVATIONS =====
-const RESA_KEYS = ['transfert-gig','christ','pain-sucre','guide-santa','augusto','lodge-rio','lodge-paraty','lodge-bateau','ouro-consigne','ouro-laran','ouro-pique','caiçara-bateau','chauffeur-gru'];
-let resaDone = load('resaDone', Object.fromEntries(RESA_KEYS.map(k => [k, true])));
+const RESA_ITEMS = [
+  {key:'transfert-gig', text:'Transfert privé GIG → Hôtel Rio',           priority:'high', group:'🌟 Priorité 1'},
+  {key:'christ',        text:'Christ Rédempteur',                          priority:'high', group:'🌟 Priorité 1'},
+  {key:'pain-sucre',    text:'Pain de Sucre',                              priority:'high', group:'🌟 Priorité 1'},
+  {key:'guide-santa',   text:'Guide privé Santa Teresa',                   priority:'high', group:'🌟 Priorité 1'},
+  {key:'augusto',       text:'Guide Augusto (Dois Irmãos)',                priority:'high', group:'🌟 Priorité 1'},
+  {key:'lodge-rio',     text:'🌴 Atlantica Lodge · Rio → Lodge',           priority:'med',  group:'🌟 Priorité 2'},
+  {key:'lodge-paraty',  text:'🌴 Atlantica Lodge · Lodge → Paraty',        priority:'med',  group:'🌟 Priorité 2'},
+  {key:'lodge-bateau',  text:'🌴 Atlantica Lodge · Excursion bateau',      priority:'med',  group:'🌟 Priorité 2'},
+  {key:'ouro-consigne', text:'🏨 Pousada do Ouro · Consigne bagages',      priority:'med',  group:'🌟 Priorité 2'},
+  {key:'ouro-laran',    text:'🏨 Pousada do Ouro · Transfert Laranjeiras', priority:'med',  group:'🌟 Priorité 2'},
+  {key:'ouro-pique',    text:'🏨 Pousada do Ouro · Pique-nique',           priority:'low',  group:'🌟 Priorité 2'},
+  {key:'caiçara-bateau',text:'⛵ Cultura Caiçara · Ponta Negra → Paraty',  priority:'med',  group:'🌟 Priorité 2'},
+  {key:'chauffeur-gru', text:'🚗 Chauffeur privé Paraty → Guarulhos',      priority:'high', group:'🌟 Priorité 2'},
+];
+let resaDone = load('resaDone', Object.fromEntries(RESA_ITEMS.map(i => [i.key, true])));
 
-function toggleResa(key, checked) {
-  resaDone[key] = checked;
+function toggleResa(key) {
+  resaDone[key] = !resaDone[key];
   save('resaDone', resaDone);
   if(typeof fbSave === 'function') fbSave('resaDone', resaDone);
+  renderResa();
 }
 
 function renderResa() {
-  RESA_KEYS.forEach(key => {
-    const el = document.getElementById('resa-' + key);
-    if(el) el.checked = !!resaDone[key];
+  const groups = ['🌟 Priorité 1','🌟 Priorité 2'];
+  let html = '';
+  groups.forEach(g => {
+    const items = RESA_ITEMS.filter(i => i.group === g);
+    html += `<p class="section-title">${g}</p>`;
+    items.forEach(item => {
+      const done = !!resaDone[item.key];
+      html += `<div class="task-item ${done?'done':''}" onclick="toggleResa('${item.key}')">
+        <div class="task-priority p-${item.priority}"></div>
+        <div class="task-check">${done?'✓':''}</div>
+        <div class="task-text">${item.text}</div>
+      </div>`;
+    });
   });
+  document.getElementById('resa-list').innerHTML = html;
 }
+renderResa();
 
 // ===== CALENDAR =====
 const events = {
