@@ -1144,8 +1144,8 @@ function renderTasks() {
   });
   document.getElementById('tasks-list').innerHTML = html || '<div class="empty-state"><span>✅</span>Toutes les tâches sont faites !</div>';
 }
-function toggleTask(id){const t=tasks.find(t=>t.id===id);if(t){t.done=!t.done;save('tasks',tasks);renderTasks();}}
-function delTask(id){tasks=tasks.filter(t=>t.id!==id);save('tasks',tasks);renderTasks();}
+function toggleTask(id){const t=tasks.find(t=>t.id===id);if(t){t.done=!t.done;fbSave('tasks',tasks);renderTasks();}}
+function delTask(id){tasks=tasks.filter(t=>t.id!==id);fbSave('tasks',tasks);renderTasks();}
 function toggleAddTask(){document.getElementById('add-task-form').classList.toggle('visible');}
 function addTask(){
   const txt=document.getElementById('new-task-text').value.trim();
@@ -1220,7 +1220,7 @@ function addNote(){
   document.getElementById('note-text').value='';
   renderNotes();
 }
-function delNote(id){notes=notes.filter(n=>n.id!==id);save('notes',notes);renderNotes();}
+function delNote(id){notes=notes.filter(n=>n.id!==id);fbSave('notes',notes);renderNotes();}
 renderNotes();
 
 // ===== DOCS =====
@@ -1271,44 +1271,35 @@ const fbdb = firebase.database();
 const REF = 'voyage';
 
 function fbSave(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-  fbdb.ref(REF + '/' + key).set(value);
+  localStorage.setItem('bres_' + key, JSON.stringify(value));
+  fbdb.ref(REF + '/' + key).set(value).catch(e => console.warn('fbSave:', e));
 }
 
-// Real-time listeners
+// Real-time listeners — always apply + re-render (pas de comparaison JSON)
 fbdb.ref(REF + '/notes').on('value', snap => {
   const val = snap.val();
   if (val === null) { fbdb.ref(REF+'/notes').set(notes); return; }
-  const arr = Array.isArray(val) ? val : Object.values(val);
-  if (JSON.stringify(arr) !== JSON.stringify(notes)) {
-    notes = arr;
-    localStorage.setItem('notes', JSON.stringify(notes));
-    if(typeof renderNotes === 'function') renderNotes();
-  }
+  notes = Array.isArray(val) ? val : Object.values(val);
+  localStorage.setItem('bres_notes', JSON.stringify(notes));
+  if(typeof renderNotes === 'function') renderNotes();
 });
 fbdb.ref(REF + '/noteId').on('value', snap => { if(snap.val()!==null) noteId = snap.val(); });
 
 fbdb.ref(REF + '/tasks').on('value', snap => {
   const val = snap.val();
   if (val === null) { fbdb.ref(REF+'/tasks').set(tasks); return; }
-  const arr = Array.isArray(val) ? val : Object.values(val);
-  if (JSON.stringify(arr) !== JSON.stringify(tasks)) {
-    tasks = arr;
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    if(typeof renderTasks === 'function') renderTasks();
-  }
+  tasks = Array.isArray(val) ? val : Object.values(val);
+  localStorage.setItem('bres_tasks', JSON.stringify(tasks));
+  if(typeof renderTasks === 'function') renderTasks();
 });
 fbdb.ref(REF + '/taskId').on('value', snap => { if(snap.val()!==null) taskId = snap.val(); });
 
 fbdb.ref(REF + '/customEvents').on('value', snap => {
   const val = snap.val();
   if (val === null) return;
-  const arr = Array.isArray(val) ? val : Object.values(val);
-  if (JSON.stringify(arr) !== JSON.stringify(customEvents)) {
-    customEvents = arr;
-    localStorage.setItem('customEvents', JSON.stringify(customEvents));
-    if(typeof reloadCustomEvents === 'function') { reloadCustomEvents(); renderCalendar(); }
-  }
+  customEvents = Array.isArray(val) ? val : Object.values(val);
+  localStorage.setItem('bres_customEvents', JSON.stringify(customEvents));
+  if(typeof reloadCustomEvents === 'function') { reloadCustomEvents(); renderCalendar(); }
 });
 
 // Indicateur de sync
