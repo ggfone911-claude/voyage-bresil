@@ -1436,6 +1436,47 @@ fbdb.ref('.info/connected').on('value', snap => {
 <!-- LEAFLET MAP -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// ===== PRÉ-CHARGEMENT TUILES RIO (hors ligne) =====
+function latLngToTileXY(lat, lng, z) {
+  const x = Math.floor((lng + 180) / 360 * Math.pow(2, z));
+  const latR = lat * Math.PI / 180;
+  const y = Math.floor((1 - Math.log(Math.tan(latR) + 1/Math.cos(latR)) / Math.PI) / 2 * Math.pow(2, z));
+  return [x, y];
+}
+async function prefetchRioTiles(btn) {
+  // Zone Rio : du centre à Barra, du nord au sud
+  const SOUTH=-23.08, NORTH=-22.73, WEST=-43.82, EAST=-43.05;
+  const ZOOMS = [11,12,13,14,15];
+  let urls = [];
+  for (const z of ZOOMS) {
+    const [x1,y1] = latLngToTileXY(NORTH,WEST,z);
+    const [x2,y2] = latLngToTileXY(SOUTH,EAST,z);
+    const subdomains = ['a','b','c'];
+    for (let x=x1;x<=x2;x++) for (let y=y1;y<=y2;y++) {
+      const s = subdomains[(x+y)%3];
+      urls.push(`https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`);
+    }
+  }
+  // Dédoublonnage + comptage
+  urls = [...new Set(urls)];
+  const total = urls.length;
+  let done = 0, errors = 0;
+  btn.disabled = true;
+  const orig = btn.innerHTML;
+  const update = () => { btn.innerHTML = `⏳ ${done+errors}/${total} tuiles`; };
+  update();
+  // Chargement par lots de 10 en parallèle
+  const BATCH = 10;
+  for (let i=0;i<urls.length;i+=BATCH) {
+    await Promise.all(urls.slice(i,i+BATCH).map(url =>
+      fetch(url, {mode:'no-cors',cache:'force-cache'}).then(()=>done++).catch(()=>errors++)
+    ));
+    update();
+  }
+  btn.innerHTML = `✅ ${done} tuiles Rio mises en cache !`;
+  setTimeout(()=>{ btn.innerHTML=orig; btn.disabled=false; }, 4000);
+}
+
 let mapInstance = null;
 function initMap(){
   if(mapInstance) { setTimeout(()=>mapInstance.invalidateSize(),100); return; }
@@ -1473,74 +1514,73 @@ function initMap(){
         .bindPopup(`<b>${s.label}</b><br><span style="font-size:.8rem;color:#666">${s.date}</span>`,{maxWidth:200});
     });
 
-    // ===== METRO RIO =====
+    // ===== METRO RIO — 3 lignes =====
     const metroL1 = [
-      {ll:[-22.9853,-43.1968], name:'General Osório',      info:'Ipanema / Leblon · départ vélos'},
-      {ll:[-22.9707,-43.1858], name:'Siqueira Campos',     info:'Copacabana nord'},
+      {ll:[-22.9853,-43.1968], name:'General Osório',       info:'🔀 Correspondance L1/L4 · Ipanema/Leblon · départ vélos'},
+      {ll:[-22.9707,-43.1858], name:'Siqueira Campos',      info:'Copacabana nord'},
       {ll:[-22.9663,-43.1825], name:'Cantagalo',            info:'Copacabana · Arpoador'},
-      {ll:[-22.9671,-43.1770], name:'Cardeal Arcoverde',   info:'Copacabana · tunnel'},
-      {ll:[-22.9408,-43.1825], name:'Botafogo',            info:'Botafogo · transfert Linha 2'},
-      {ll:[-22.9337,-43.1741], name:'Flamengo',            info:'Parque do Flamengo'},
-      {ll:[-22.9271,-43.1731], name:'Largo do Machado',    info:'Catete / Largo do Machado'},
-      {ll:[-22.9256,-43.1695], name:'Catete',              info:'Musée de la République'},
-      {ll:[-22.9198,-43.1744], name:'Glória',              info:'Igreja da Glória · baie de Guanabara'},
-      {ll:[-22.9109,-43.1756], name:'Cinelândia',          info:'Centro · Theatro Municipal'},
-      {ll:[-22.9085,-43.1780], name:'Carioca',             info:'Centro · Confeitaria Colombo à 5min'},
-      {ll:[-22.9057,-43.1796], name:'Uruguaiana',          info:'Centro commerçant'},
-      {ll:[-22.9016,-43.1832], name:'Central',             info:'Gare centrale · bonde Santa Teresa ici'},
-      {ll:[-22.9037,-43.1869], name:'Cidade Nova',         info:'Sambódromo'},
-      {ll:[-22.9052,-43.1924], name:'Estácio',             info:'🔀 Correspondance Linha 1 ↔ Linha 2'},
-      {ll:[-22.8949,-43.2207], name:'São Cristóvão',       info:'Zona Norte'},
-      {ll:[-22.9120,-43.2302], name:'Maracanã',            info:'Stade du Maracanã'},
-      {ll:[-22.9167,-43.2480], name:'São Francisco Xavier',info:'Tijuca'},
-      {ll:[-22.9213,-43.2611], name:'Saens Peña',          info:'Tijuca · terminus touristique'},
+      {ll:[-22.9671,-43.1770], name:'Cardeal Arcoverde',    info:'Copacabana'},
+      {ll:[-22.9408,-43.1825], name:'Botafogo',             info:'🔀 Correspondance L1/L2 · Botafogo'},
+      {ll:[-22.9337,-43.1741], name:'Flamengo',             info:'Parque do Flamengo'},
+      {ll:[-22.9271,-43.1731], name:'Largo do Machado',     info:'Largo do Machado'},
+      {ll:[-22.9256,-43.1695], name:'Catete',               info:'Musée de la République'},
+      {ll:[-22.9198,-43.1744], name:'Glória',               info:'Igreja da Glória'},
+      {ll:[-22.9109,-43.1756], name:'Cinelândia',           info:'Centro · Theatro Municipal'},
+      {ll:[-22.9085,-43.1780], name:'Carioca',              info:'Centro · Confeitaria Colombo 5min'},
+      {ll:[-22.9057,-43.1796], name:'Uruguaiana',           info:'Centro commerçant'},
+      {ll:[-22.9016,-43.1832], name:'Central',              info:'Gare centrale · 🚃 Bonde Santa Teresa ici !'},
+      {ll:[-22.9037,-43.1869], name:'Cidade Nova',          info:'Sambódromo'},
+      {ll:[-22.9052,-43.1924], name:'Estácio',              info:'🔀 Correspondance L1/L2'},
+      {ll:[-22.8949,-43.2207], name:'São Cristóvão',        info:'Zona Norte'},
+      {ll:[-22.9120,-43.2302], name:'Maracanã',             info:'🏟️ Stade Maracanã'},
+      {ll:[-22.9167,-43.2480], name:'São Francisco Xavier', info:'Tijuca'},
+      {ll:[-22.9213,-43.2611], name:'Saens Peña',           info:'Tijuca'},
     ];
 
     const metroL2 = [
-      {ll:[-22.9052,-43.1924], name:'Estácio',             info:'🔀 Correspondance Linha 1 ↔ Linha 2'},
-      {ll:[-22.9048,-43.1865], name:'Praça Onze',          info:'Proximité Sambódromo'},
-      {ll:[-22.9014,-43.1797], name:'Afonso Pena',         info:'Zona Norte'},
-      {ll:[-22.8998,-43.1760], name:'Thomás Coelho',       info:'Zona Norte'},
-      {ll:[-22.8930,-43.1731], name:'Del Castilho',        info:'Zona Norte'},
-      {ll:[-22.8832,-43.1688], name:'Inhaúma',             info:'Zona Norte'},
-      {ll:[-22.8752,-43.1641], name:'Engenho da Rainha',   info:'Zona Norte'},
-      {ll:[-22.8679,-43.3217], name:'Irajá',               info:'Zona Norte'},
-      {ll:[-22.8598,-43.3394], name:'Coelho Neto',         info:'Zona Norte'},
-      {ll:[-22.8464,-43.3594], name:'Acari / Faz. Botafogo',info:'Zona Norte'},
-      {ll:[-22.8353,-43.3765], name:'Eng. Rubens Paiva',   info:'Terminus Linha 2'},
+      {ll:[-22.9408,-43.1825], name:'Botafogo',             info:'🔀 Correspondance L1/L2'},
+      {ll:[-22.9283,-43.1753], name:'Humaitá',              info:'Humaitá'},
+      {ll:[-22.9571,-43.1927], name:'Gávea',                info:'Terminus L2 · Gávea · Lagoa'},
     ];
 
-    const mkMetro = (station, color) => {
-      const c = L.circleMarker(station.ll, {
-        radius:6, fillColor:color, color:'white',
-        weight:2, opacity:1, fillOpacity:.9
-      });
-      c.bindPopup(`<b>🚇 ${station.name}</b><br><span style="font-size:.78rem;color:#555">${station.info}</span>`, {maxWidth:220});
+    const metroL4 = [
+      {ll:[-22.9853,-43.1968], name:'General Osório',       info:'🔀 Correspondance L1/L4 · Ipanema'},
+      {ll:[-22.9872,-43.2038], name:'Nossa Sra da Paz',     info:'Ipanema'},
+      {ll:[-22.9889,-43.2178], name:'Antero de Quental',    info:'Leblon'},
+      {ll:[-22.9923,-43.2352], name:'Jardim de Alah',       info:'Leblon · Barra → tunnel sous montagne'},
+      {ll:[-23.0055,-43.3122], name:'Jardim Oceânico',      info:'🏖️ Barra da Tijuca · terminus L4'},
+    ];
+
+    const mkMetro = (s, color) => {
+      const c = L.circleMarker(s.ll, {radius:6, fillColor:color, color:'white', weight:2, opacity:1, fillOpacity:.9});
+      c.bindPopup(`<b>🚇 ${s.name}</b><br><span style="font-size:.78rem;color:#555">${s.info}</span>`, {maxWidth:230});
       return c;
     };
 
-    const layerMetroL1 = L.layerGroup(metroL1.map(s => mkMetro(s,'#e87722')));
-    const layerMetroL2 = L.layerGroup(metroL2.map(s => mkMetro(s,'#3aaa35')));
-    const lineL1 = L.polyline(metroL1.map(s=>s.ll), {color:'#e87722', weight:4, opacity:.7});
-    const lineL2 = L.polyline(metroL2.map(s=>s.ll), {color:'#3aaa35', weight:4, opacity:.7});
-
-    const metroGroup = L.layerGroup([lineL1, lineL2, layerMetroL1, layerMetroL2]);
+    const grpL1 = L.layerGroup([L.polyline(metroL1.map(s=>s.ll),{color:'#e87722',weight:4,opacity:.8}), ...metroL1.map(s=>mkMetro(s,'#e87722'))]);
+    const grpL2 = L.layerGroup([L.polyline(metroL2.map(s=>s.ll),{color:'#3aaa35',weight:4,opacity:.8}), ...metroL2.map(s=>mkMetro(s,'#3aaa35'))]);
+    const grpL4 = L.layerGroup([L.polyline(metroL4.map(s=>s.ll),{color:'#f5c300',weight:4,opacity:.8}), ...metroL4.map(s=>mkMetro(s,'#d4aa00'))]);
+    const metroGroup = L.layerGroup([grpL1, grpL2, grpL4]);
 
     // Bouton toggle métro
     const MetroControl = L.Control.extend({
       options:{position:'topright'},
-      onAdd: function(){
-        const btn = L.DomUtil.create('button','metro-toggle-btn');
-        btn.innerHTML = '🚇 Métro Rio';
-        btn.style.cssText = 'background:white;border:2px solid #e87722;border-radius:8px;padding:.4rem .8rem;font-size:.8rem;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#e87722';
-        let on = false;
-        L.DomEvent.on(btn,'click', function(e){
-          L.DomEvent.stopPropagation(e);
-          on = !on;
-          if(on){ metroGroup.addTo(mapInstance); btn.style.background='#e87722'; btn.style.color='white'; }
-          else  { metroGroup.remove(); btn.style.background='white'; btn.style.color='#e87722'; }
-        });
-        return btn;
+      onAdd(){
+        const wrap = L.DomUtil.create('div');
+        wrap.style.cssText='display:flex;flex-direction:column;gap:.35rem';
+        const mkBtn = (label, color, action) => {
+          const b = L.DomUtil.create('button','',wrap);
+          b.innerHTML=label;
+          b.style.cssText=`background:white;border:2px solid ${color};border-radius:8px;padding:.35rem .75rem;font-size:.78rem;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.15);color:${color};display:block;width:100%`;
+          let on=false;
+          L.DomEvent.on(b,'click',e=>{L.DomEvent.stopPropagation(e);on=!on;action(on);b.style.background=on?color:'white';b.style.color=on?'white':color;});
+          return b;
+        };
+        mkBtn('🚇 L1 Orange','#e87722', on=>on?grpL1.addTo(mapInstance):grpL1.remove());
+        mkBtn('🚇 L2 Verte','#3aaa35',  on=>on?grpL2.addTo(mapInstance):grpL2.remove());
+        mkBtn('🚇 L4 Jaune','#c8a800',  on=>on?grpL4.addTo(mapInstance):grpL4.remove());
+        mkBtn('📥 Hors ligne Rio', '#6366f1', on=>{if(on)prefetchRioTiles(wrap.querySelector('button:last-child'));});
+        return wrap;
       }
     });
     new MetroControl().addTo(mapInstance);
@@ -1548,13 +1588,14 @@ function initMap(){
     // Légende
     const Legend = L.Control.extend({
       options:{position:'bottomleft'},
-      onAdd: function(){
+      onAdd(){
         const d = L.DomUtil.create('div');
-        d.style.cssText='background:white;padding:.5rem .8rem;border-radius:8px;font-size:.72rem;box-shadow:0 2px 6px rgba(0,0,0,.15);line-height:1.7';
-        d.innerHTML='<b style="font-size:.75rem">Métro Rio</b><br>'
-          +'<span style="color:#e87722">●</span> Linha 1 (orange) — Ipanema → Saens Peña<br>'
-          +'<span style="color:#3aaa35">●</span> Linha 2 (verte) — Estácio → Eng. Rubens Paiva<br>'
-          +'<span style="font-size:.68rem;color:#888">Clic sur station = infos + à proximité</span>';
+        d.style.cssText='background:white;padding:.5rem .8rem;border-radius:8px;font-size:.7rem;box-shadow:0 2px 6px rgba(0,0,0,.15);line-height:1.8;max-width:200px';
+        d.innerHTML='<b style="font-size:.73rem">MetrôRio</b><br>'
+          +'<span style="color:#e87722">━</span> L1 Orange — Ipanema → Saens Peña<br>'
+          +'<span style="color:#3aaa35">━</span> L2 Verte — Botafogo → Gávea<br>'
+          +'<span style="color:#c8a800">━</span> L4 Jaune — Ipanema → Barra<br>'
+          +'<span style="color:#888;font-size:.65rem">Clic station = infos · tunnel L4 sous la montagne</span>';
         return d;
       }
     });
